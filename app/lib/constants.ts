@@ -1,12 +1,16 @@
-import { BaseGoerli, Goerli } from "@thirdweb-dev/chains";
+import { BaseGoerli, Goerli, OptimismGoerli } from "@thirdweb-dev/chains";
 
 export const THIRDWEB_API_KEY = "4c91b95da4fd3f030f91f5e01f4f0bbf"; // process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID;
 
-export const chain = Goerli;
+export const chain = OptimismGoerli;
 
 const chainInfos = {
   [Goerli.chainId]: {
     factoryAddress: "0xeC06A32F2a421544BA552373d254071492aD7629", // 0xF8631a71b51129453fb70057aAcA80d4c2f0929F
+    openEditionContract: "0xf369A5ca2e08350F74fB183F32b5FdB69C8B26B7",
+  },
+  [OptimismGoerli.chainId]: {
+    factoryAddress: "0xF5e93E83383CaBBC90aee394f2a9dB665ffE9eBd", // 0xF8631a71b51129453fb70057aAcA80d4c2f0929F
     openEditionContract: "0xf369A5ca2e08350F74fB183F32b5FdB69C8B26B7",
   },
   [BaseGoerli.chainId]: {
