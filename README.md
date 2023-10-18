@@ -5,12 +5,11 @@ This is a research project to use [WebAuthn](https://developer.mozilla.org/en-US
 ## Goals
 
 - Simplify user onboarding flow for blockchain projects
-- Make user wallets more secured than it's today
 - Make blockchain accessible to millions of new users, with no friction
 
 ## Vision
 
-There shouldn't be a centralized place like a chrome extension, or a mobile app, which will store our private keys. Instead, we should use modern standards like WebAuthn, Account Abstraction and create a SDK, which can be integrated into any website in a few lines of code. Each domain will store it's own private keys and it will be secured and managed by the browser. Users shouldn't have the read access to their private keys. Users can only use it to do the signature.
+Installing a chrome extension, or a mobile app to use a wallet is a big blocker for user onboarding. Instead, we should use modern standards like WebAuthn, Account Abstraction and create a SDK, which can be integrated into any website in a few lines of code.
 
 This project is created for **Public Goods**. If you like the idea and plan to use it, feel free to contribute as well.
 
