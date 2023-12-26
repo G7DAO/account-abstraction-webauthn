@@ -11,8 +11,6 @@ This is a research project to use [WebAuthn](https://developer.mozilla.org/en-US
 
 Installing a chrome extension, or a mobile app to use a wallet is a big blocker for user onboarding. Instead, we should use modern standards like WebAuthn and Account Abstraction to onboard users by using their FaceID/Fingerprint, without installing any additional app or extension. Software engineers should have a SDK, which can be integrated into any website in a few lines of code and use this new way of user onboarding/authentication.
 
-This project is created for **Public Goods**. If you like the idea and plan to use it, feel free to contribute as well.
-
 ## Idea / How it works
 
 1. User will generate a private key on their device by using a WebAuthn standard.

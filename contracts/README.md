@@ -1,47 +1,66 @@
-## Getting Started
+## Foundry
 
-Create a project using this example:
+**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
-```bash
-npx thirdweb create --contract --template hardhat-javascript-starter
+Foundry consists of:
+
+- **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
+- **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
+- **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
+- **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+
+## Documentation
+
+https://book.getfoundry.sh/
+
+## Usage
+
+### Build
+
+```shell
+$ forge build
 ```
 
-You can start editing the page by modifying `contracts/Contract.sol`.
+### Test
 
-To add functionality to your contracts, you can use the `@thirdweb-dev/contracts` package which provides base contracts and extensions to inherit. The package is already installed with this project. Head to our [Contracts Extensions Docs](https://portal.thirdweb.com/contractkit) to learn more.
-
-## Building the project
-
-After any changes to the contract, run:
-
-```bash
-npm run build
-# or
-yarn build
+```shell
+$ forge test
 ```
 
-to compile your contracts. This will also detect the [Contracts Extensions Docs](https://portal.thirdweb.com/contractkit) detected on your contract.
+### Format
 
-## Deploying Contracts
-
-When you're ready to deploy your contracts, just run one of the following command to deploy you're contracts:
-
-```bash
-npm run deploy
-# or
-yarn deploy
+```shell
+$ forge fmt
 ```
 
-## Releasing Contracts
+### Gas Snapshots
 
-If you want to release a version of your contracts publicly, you can use one of the followings command:
-
-```bash
-npm run release
-# or
-yarn release
+```shell
+$ forge snapshot
 ```
 
-## Join our Discord!
+### Anvil
 
-For any questions, suggestions, join our discord at [https://discord.gg/thirdweb](https://discord.gg/thirdweb).
+```shell
+$ anvil
+```
+
+### Deploy
+
+```shell
+$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
+
+### Cast
+
+```shell
+$ cast <subcommand>
+```
+
+### Help
+
+```shell
+$ forge --help
+$ anvil --help
+$ cast --help
+```
