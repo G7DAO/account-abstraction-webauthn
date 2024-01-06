@@ -2,6 +2,10 @@
 
 This is a research project to use [WebAuthn](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API) (FaceID/Fingerprint Authentication) with [Account Abstraction](https://eips.ethereum.org/EIPS/eip-4337) (ERC 4337)
 
+
+![AA WebAuthn Flow](https://github.com/G7DAO/account-abstraction-webauthn/assets/1698274/dcbdb87b-1fbc-4d6d-8dda-ebe8d3431a8b)
+
+
 ## Goals
 
 - Simplify user onboarding flow for blockchain projects
