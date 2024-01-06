@@ -1,308 +1,160 @@
-import {
-  startAuthentication,
-  startRegistration,
-} from '@simplewebauthn/browser';
-import base64url from 'base64url';
-import { Contract, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import { IUserOperation, Presets, UserOperationBuilder } from 'userop';
-import entrypoint from '../abis/entrypoint.json';
-import polaroid from '../abis/polaroid.json';
-import simpleAccount from '../abis/simpleAccount.json';
-import walletFactory from '../abis/webauthnWalletFactory.json';
-import { environment } from '../environments/environment';
-import { authResponseToSigVerificationInput } from './debugger/authResponseToSigVerificationInput';
-import { decodeAuthenticationCredential } from './debugger/decodeAuthenticationCredential';
-import { decodeRegistrationCredential } from './debugger/decodeRegistrationCredential';
 
-export const simpleAccountAbi = new ethers.utils.Interface(simpleAccount.abi);
+import {
+  resolveAccount,
+  resolveAlchemyGasAndPaymasterData,
+  resolveNonce,
+  resolveWebAuthnSignature,
+} from '../presets';
 
-const provider = new ethers.providers.StaticJsonRpcProvider(environment.rpc);
-const paymasterProvider = new ethers.providers.StaticJsonRpcProvider(
-  environment.paymasterRpc
-);
+import {
+  ENTRYPOINT_ADDRESS,
+  avatarPackContract,
+  entrypointContract,
+  provider,
+  walletFactoryContract,
+  webauthnAccountAbi,
+} from './contracts';
 
-const walletFactoryContract = new Contract(
-  environment.walletFactoryContract,
-  walletFactory.abi,
-  provider
-);
-export const entrypointContract = new Contract(
-  environment.entrypointContract,
-  entrypoint.abi,
-  provider
-);
-
-export const nftPolaroidContract = new Contract(
-  environment.nftContract,
-  polaroid.abi,
-  provider
-);
-
-export const bundler = new ethers.providers.StaticJsonRpcProvider(
-  environment.bundlerRpc
-);
+const LOGIN_URL = 'https://webauthn-server.deno.dev/login';
+const CUSTOM_PAYMASTER_URL =
+  'https://webauthn-server.deno.dev/sponsorUserOperation';
 
 export async function sendTransaction(
-  login: string,
-  blob: Blob | null | undefined
-) {
-  if (!login) throw Error('Login not set');
-  if (!blob) throw new Error('no blob');
+  loginUsername: string,
+  paymaster: 'STACKUP' | 'ALCHEMY',
+  statusUpdateFn: (status: string) => void
+): Promise<[ethers.Event[], ethers.providers.TransactionResponse]> {
+  if (!loginUsername) throw Error('Login not set');
 
-  console.log('waiting');
-  const hash = await uploadToIPFS(blob);
-  console.log('yo hash', hash);
-  console.log('yo login', login);
+  const walletAddress = await walletFactoryContract['getAddress'](
+    loginUsername,
+    0
+  );
+  console.log('walletAddress', walletAddress);
 
-  const walletAddress = await getAddress(login);
-  console.log('yo walletAddress', walletAddress);
+  statusUpdateFn(`Selected Paymaster: ${paymaster}`);
+
+  statusUpdateFn(`Wallet address: <pre>${walletAddress}</pre>`);
+
   const userOpBuilder = new UserOperationBuilder()
     .useDefaults({
       sender: walletAddress,
+      signature:
+        '0x0000000000000000000000000000000000000000000000000000000000000000450000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000032000000000000000000000000000000000000000000000000000000000000000276b09534b500ac0c94655a5b33c7e3a9eac259e59a4d9bc364fa065d3ec052f056f4e1dad27f0d51b7ba7d0851795c08b7faa5a5f173874e4e3ebd6b45646ebb1000000000000000000000000000000000000000000000000000000000000036000000000000000000000000000000000000000000000000000000000000000a449960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97634500000000b53976664885aa6bcebfe52262a439a20020b1e9400a0d0d9d222163b07a80c48f99af404a82572a6baf070ec660a8387f3da50102032620012158200925a64c9f41c52f20f5ba7b8201611c62b47d6b23a9027da9c5c9c444a142fb2258200767b285a7785d35532e4e6b3a3662741c3b5ad11b93ccaf3b2447afde80b5d40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f67b2274797065223a22776562617574686e2e637265617465222c226368616c6c656e6765223a225f2d5f5461514375524f744b63544757533143795a43796a414436366143686f4b363664616b396c436d73222c226f726967696e223a22687474703a2f2f6c6f63616c686f73743a34323030222c2263726f73734f726967696e223a66616c73652c226f746865725f6b6579735f63616e5f62655f61646465645f68657265223a22646f206e6f7420636f6d7061726520636c69656e74446174614a534f4e20616761696e737420612074656d706c6174652e205365652068747470733a2f2f676f6f2e676c2f796162506578227d000000000000000000000000000000000000000000000000000000000000000000000000000000000020ffefd36900ae44eb4a7131964b50b2642ca3003eba6828682bae9d6a4f650a6b00000000000000000000000000000000000000000000000000000000000001c0020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000001000925a64c9f41c52f20f5ba7b8201611c62b47d6b23a9027da9c5c9c444a142fb0767b285a7785d35532e4e6b3a3662741c3b5ad11b93ccaf3b2447afde80b5d400000000000000000000000000000000000000000000000000000000000001400000000000000000000000000000000000000000000000000000000000000005657a656b690000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020b1e9400a0d0d9d222163b07a80c48f99af404a82572a6baf070ec660a8387f3d0000000000000000000000000000000000000000000000000000000000000041e7eb26d32f7e1573dbc2879a2525ac14c553a817c489adb777ba8feb9f6b703c5f33160f9d94b0f6b3b715cf1747f0f3599858e92bf223d47633b1c8c5ba6b471c00000000000000000000000000000000000000000000000000000000000000', // dummy signature
     })
     .useMiddleware(Presets.Middleware.getGasPrice(provider))
-    .setCallData(
-      simpleAccountAbi.encodeFunctionData('execute', [
-        nftPolaroidContract.address,
-        0,
-        nftPolaroidContract.interface.encodeFunctionData('mint', [
-          Buffer.from(hash),
-        ]),
-      ])
+    .useMiddleware(resolveNonce(entrypointContract, walletAddress))
+    .useMiddleware(
+      resolveAccount(
+        provider,
+        walletFactoryContract,
+        loginUsername,
+        walletAddress
+      )
     )
-    .setNonce(await entrypointContract['getNonce'](walletAddress, 0));
 
-  const walletCode = await provider.getCode(walletAddress);
-  console.log('yo walletCode', walletCode);
-  const walletExists = walletCode !== '0x';
-  console.log('yo walletExists', walletExists);
-  console.log({ walletExists });
+    .useMiddleware(
+      paymaster === 'STACKUP'
+        ? // >> Stackup Paymaster
+          Presets.Middleware.verifyingPaymaster(
+            'https://api.stackup.sh/v1/paymaster/54fe8665d13ebc11341af214d62141289d4348a1fdbf72041e9ca1e4f06bd16b',
+            { type: 'payg' }
+          )
+        : // >> Aclhemy Paymaster
+          resolveAlchemyGasAndPaymasterData(
+            ENTRYPOINT_ADDRESS,
+            'https://eth-sepolia.g.alchemy.com/v2/G877AttcsdLjN_XYyon926pWginvLx9L',
+            '9cef39a1-c45e-46d0-bf50-b977875579d2',
+            { preVerificationGas: { percentage: 120 } }
+          )
+    )
 
-  if (!walletExists) {
-    userOpBuilder.setInitCode(
-      walletFactoryContract.address +
-        walletFactoryContract.interface
-          .encodeFunctionData('createAccount(string, uint256)', [login, 0])
-          .slice(2)
-    );
-  }
+    // >> Custom Paymaster
+    // .useMiddleware(
+    //   resolveCustomPaymasterData(
+    //     provider,
+    //     CUSTOM_PAYMASTER_URL,
+    //     ENTRYPOINT_ADDRESS
+    //   )
+    // )
 
-  const { chainId } = await provider.getNetwork();
-  const userOpToEstimateNoPaymaster = await userOpBuilder.buildOp(
-    environment.entrypointContract,
-    chainId
-  );
-  const paymasterAndData = await getPaymasterData(userOpToEstimateNoPaymaster);
-  const userOpToEstimate = {
-    ...userOpToEstimateNoPaymaster,
-    paymasterAndData: paymasterAndData,
-  };
-  console.log({ userOpToEstimate });
-  console.log('estimated userop', userOpToSolidity(userOpToEstimate));
-
-  const [gasLimits, baseUserOp] = await Promise.all([
-    getGasLimits(userOpToEstimate),
-    userOpBuilder.buildOp(environment.entrypointContract, chainId),
-  ]);
-  console.log({
-    gasLimits: Object.fromEntries(
-      Object.entries(gasLimits).map(([key, value]) => [
-        key,
-        ethers.BigNumber.from(value).toString(),
+    .useMiddleware(resolveWebAuthnSignature(LOGIN_URL, loginUsername))
+    .setCallData(
+      webauthnAccountAbi.encodeFunctionData('execute', [
+        avatarPackContract.address,
+        0,
+        avatarPackContract.interface.encodeFunctionData('mint', []),
       ])
+    );
+
+  // Build and sign userOp
+  const { chainId } = await provider.getNetwork();
+
+  statusUpdateFn(`ChainId: <pre>${chainId}</pre>`);
+
+  statusUpdateFn(`Building userOp...`);
+
+  const signedUserOp = await userOpBuilder.buildOp(ENTRYPOINT_ADDRESS, chainId);
+
+  statusUpdateFn(`userOp: <pre>${JSON.stringify(signedUserOp, null, 2)}</pre>`);
+
+  // Send userOp
+  const receipt = await sendUserOp(signedUserOp, statusUpdateFn);
+
+  await receipt.wait();
+
+  statusUpdateFn(`confirmed. querying events...`);
+
+  console.log(receipt.hash);
+  console.log('confirmed');
+  console.log({ receipt });
+  const events = await avatarPackContract.queryFilter(
+    avatarPackContract.filters['Transfer'](
+      ethers.constants.AddressZero,
+      walletAddress
     ),
-  });
-  const userOp: IUserOperation = {
-    ...baseUserOp,
-    callGasLimit: gasLimits.callGasLimit,
-    preVerificationGas: gasLimits.preVerificationGas + 20000,
-    verificationGasLimit: gasLimits.verificationGasLimit,
-    paymasterAndData: paymasterAndData,
-  };
+    receipt.blockNumber
+  );
+  console.log({ events });
 
-  console.log({ userOp });
-  // console.log('to sign', userOpToSolidity(userOp));
-  const userOpHash = await entrypointContract['getUserOpHash'](userOp);
-  console.log('TO SIGN', { userOpHash });
-  const loginPasskeyId = localStorage.getItem(`${login}_passkeyId`);
-  const signature = loginPasskeyId
-    ? await signUserOp(userOpHash, loginPasskeyId)
-    : await signUserOpWithCreate(userOpHash, login);
+  statusUpdateFn(
+    `events: ${events.map(
+      (x) => `<pre>${x.event} (from: ${x.args![0]} to: ${x.args![1]})</pre>`
+    )}`
+  );
 
-  if (!signature) throw new Error('Signature failed');
-  const signedUserOp: IUserOperation = {
-    ...userOp,
-    // paymasterAndData: await getPaymasterData(userOp),
-    signature,
-  };
-  console.log({ signedUserOp });
-  console.log('signed', userOpToSolidity(signedUserOp));
+  const tokenUri = await avatarPackContract['tokenURI'](
+    events[0].args?.['tokenId']
+  );
 
-  sendUserOp(signedUserOp)
-    .then(async (receipt) => {
-      await receipt.wait();
-      console.log(receipt.hash);
-      console.log('confirmed');
-      console.log({ receipt });
-      // const events = await nftPolaroidContract.queryFilter(
-      //   nftPolaroidContract.filters.Transfer(
-      //     ethers.constants.AddressZero,
-      //     walletAddress
-      //   ),
-      //   receipt.blockNumber
-      // );
-      // console.log({ events });
-      // await webcamRef.current?.reveal();
-      // const tokenUri = await nftPolaroidContract.tokenURI(
-      //   events[0].args?.tokenId
-      // );
-      // console.log(
-      //   `https://demo.storj-ipfs.com/ipfs/${tokenUri.replace('ipfs://', '')}`,
-      //   tokenUri
-      // );
-      // const { data: metadata } = await fetch(
-      //   `https://demo.storj-ipfs.com/ipfs/${tokenUri.replace('ipfs://', '')}`
-      // ).then((x) => x.json());
-      // console.log(metadata);
-      // chatBubbleRef.current?.show();
-    })
-    .catch((e: Error) => {
-      console.log('error');
-      console.error(e);
-    });
+  return [events, receipt];
 }
 
-const uploadToIPFS = async (blob: Blob | null): Promise<string> => {
-  if (blob === null) throw new Error('no blob');
-
-  const formDataImage = new FormData();
-  formDataImage.append('file', blob);
-
-  // const { data: cidImage } = await fetch(
-  //   'https://demo.storj-ipfs.com/api/v0/add',
-  //   {
-  //     method: 'POST',
-  //     body: formDataImage,
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data',
-  //     },
-  //   }
-  // ).then((x) => x.json());
-
-  // const metadata = {
-  //   description: 'A selfie taken during ETHGlobal NYC 2023',
-  //   image: 'ipfs://' + cidImage.Hash,
-  //   name: 'ETHGlobal NYC 2023',
-  // };
-  // const formDataMetadata = new FormData();
-  // formDataMetadata.append(
-  //   'file',
-  //   new Blob([JSON.stringify(metadata)], { type: 'application/json' })
-  // );
-
-  // const { data: cidMetadata } = await fetch(
-  //   'https://demo.storj-ipfs.com/api/v0/add',
-  //   {
-  //     method: 'POST',
-  //     body: formDataMetadata,
-  //     headers: {
-  //       'Content-Type': 'multipart/form-data',
-  //     },
-  //   }
-  // ).then((x) => x.json());
-
-  // return cidMetadata.Hash;
-
-  return crypto.randomUUID();
-};
-
-const getAddress = async (login: string): Promise<string> => {
-  return walletFactoryContract['getAddress'](login, 0);
-};
-
-export const userOpToSolidity = (userOp: IUserOperation): string =>
-  `
-sender: ${userOp.sender},
-nonce: ${ethers.BigNumber.from(userOp.nonce).toHexString()},
-initCode: hex"${userOp.initCode.toString().slice(2)}",
-callData: hex"${userOp.callData.toString().slice(2)}",
-callGasLimit: ${ethers.BigNumber.from(userOp.callGasLimit).toHexString()},
-verificationGasLimit: ${ethers.BigNumber.from(
-    userOp.verificationGasLimit
-  ).toHexString()},
-preVerificationGas: ${ethers.BigNumber.from(
-    userOp.preVerificationGas
-  ).toHexString()},
-maxFeePerGas: ${ethers.BigNumber.from(userOp.maxFeePerGas).toHexString()},
-maxPriorityFeePerGas: ${ethers.BigNumber.from(
-    userOp.maxPriorityFeePerGas
-  ).toHexString()},
-paymasterAndData: hex"${userOp.paymasterAndData.toString().slice(2)}",
-signature: hex"${userOp.signature.toString().slice(2)}"`;
-
-export const getGasLimits = async (
-  userOp: IUserOperation
-): Promise<{
-  callGasLimit: string;
-  preVerificationGas: string;
-  verificationGasLimit: string;
-}> => {
-  console.log('ESTIMATING', userOp);
-  return bundler.send('eth_estimateUserOperationGas', [
-    {
-      ...userOp,
-      verificationGasLimit: '0x989680', // 10e6,
-    } as IUserOperation,
-    environment.entrypointContract,
-  ]);
-};
-
-export const getPaymasterData = async (
-  userOp: IUserOperation
-): Promise<any> => {
-  // return paymasterProvider.send('alchemy_requestPaymasterAndData', [
-  //   {
-  //     policyId: '32fc1986-def9-4987-8c84-2543165a143a',
-  //     entryPoint: environment.entrypointContract,
-  //     userOperation: userOp,
-  //   },
-  // ]);
-
-  // return paymasterProvider.send('pm_sponsorUserOperation', [
-  //   userOp,
-  //   environment.entrypointContract,
-  //   { type: 'payg' },
-  // ]);
-
-  return paymasterProvider.send('pm_sponsorUserOperation', [userOp]);
-
-  // return fetch(environment.paymasterUrl, {
-  //   method: 'POST',
-  //   body: JSON.stringify(userOp),
-  //   headers: {
-  //     'content-type': 'application/json',
-  //   },
-  // })
-  //   .then((x) => x.json())
-  //   .then((x) => x.paymasterData);
-};
-
-export const sendUserOp = async (
-  userOp: IUserOperation
+const sendUserOp = async (
+  userOp: IUserOperation,
+  statusUpdateFn: (status: string) => void
 ): Promise<ethers.providers.TransactionResponse> => {
-  console.log('yo userOp', userOp);
+  console.log('yo userOp', JSON.stringify(userOp));
   console.log('yo entrypoint', entrypointContract.address);
-  const userOpHash = await bundler.send('eth_sendUserOperation', [
+  const userOpHash = await provider.send('eth_sendUserOperation', [
     userOp,
     entrypointContract.address,
   ]);
-  return waitForUserOp(userOpHash, userOp);
+
+  statusUpdateFn(
+    `userOpHash: <pre>${userOpHash}</pre> waiting for the confirmatoin...`
+  );
+
+  return waitForUserOp(userOpHash, userOp, 50, statusUpdateFn);
 };
 
-export const waitForUserOp = async (
+const waitForUserOp = async (
   userOpHash: string,
   userOp: IUserOperation,
-  maxRetries = 50
+  maxRetries = 50,
+  statusUpdateFn: (status: string) => void
 ): Promise<ethers.providers.TransactionResponse> => {
   if (maxRetries < 0) {
     throw new Error("Couldn't find the userOp broadcasted: " + userOpHash);
@@ -314,6 +166,8 @@ export const waitForUserOp = async (
     lastBlock.number - 100
   );
 
+  statusUpdateFn('Checking...');
+
   if (events[0]) {
     const transaction = await events[0].getTransaction();
     return transaction;
@@ -322,248 +176,5 @@ export const waitForUserOp = async (
   await new Promise((resolve) => {
     setTimeout(resolve, 1000);
   });
-  return waitForUserOp(userOpHash, userOp, --maxRetries);
+  return waitForUserOp(userOpHash, userOp, --maxRetries, statusUpdateFn);
 };
-
-export const signUserOp = async (
-  userOpHash: string,
-  passkeyIdHex: string
-): Promise<string> => {
-  console.log({ userOpHash });
-
-  const challenge = Buffer.from(userOpHash.slice(2), 'hex');
-  console.log('base6url challenge', base64url.encode(challenge));
-
-  const signatureResponse = await startAuthentication({
-    challenge: base64url.encode(challenge),
-    allowCredentials: [
-      {
-        id: base64url.encode(Buffer.from(passkeyIdHex.slice(2), 'hex')),
-        type: 'public-key',
-        transports: ['internal'],
-      },
-    ],
-  });
-  console.log('webauthn response', signatureResponse);
-
-  const { response: decodedResponse } =
-    decodeAuthenticationCredential(signatureResponse);
-  console.log('decoded webauthn response', decodedResponse);
-
-  const ecVerifyInputs = authResponseToSigVerificationInput(
-    {},
-    signatureResponse.response
-  );
-  console.log('verify inputs', ecVerifyInputs);
-
-  const challengeOffsetRegex = new RegExp(
-    `(.*)${Buffer.from(base64url.encode(challenge)).toString('hex')}`
-  );
-  const challengePrefix = challengeOffsetRegex.exec(
-    base64url
-      .toBuffer(signatureResponse.response.clientDataJSON)
-      .toString('hex')
-  )?.[1];
-  console.log({ challengeOffsetRegex, challengePrefix });
-
-  console.log('webauthn verify inputs', [
-    SignatureTypes.WEBAUTHN_UNPACKED,
-    decodedResponse.authenticatorData.flagsMask,
-    `0x${base64url
-      .toBuffer(signatureResponse.response.authenticatorData)
-      .toString('hex')}`,
-    `0x${base64url
-      .toBuffer(signatureResponse.response.clientDataJSON)
-      .toString('hex')}`,
-    userOpHash,
-    Buffer.from(challengePrefix || '', 'hex').length,
-    ecVerifyInputs.signature[0],
-    ecVerifyInputs.signature[1],
-    Buffer.from(passkeyIdHex.slice(2), 'hex').toString('hex'),
-  ]);
-
-  return ethers.utils.defaultAbiCoder.encode(
-    [
-      'bytes1',
-      'bytes1',
-      'bytes',
-      'bytes',
-      'bytes',
-      'uint256',
-      'uint256',
-      'uint256',
-      'bytes',
-    ],
-    [
-      SignatureTypes.WEBAUTHN_UNPACKED,
-      decodedResponse.authenticatorData.flagsMask,
-      base64url.toBuffer(signatureResponse.response.authenticatorData),
-      base64url.toBuffer(signatureResponse.response.clientDataJSON),
-      Buffer.from(userOpHash.slice(2), 'hex'),
-      Buffer.from(challengePrefix || '', 'hex').length,
-      ecVerifyInputs.signature[0],
-      ecVerifyInputs.signature[1],
-      Buffer.from(passkeyIdHex.slice(2), 'hex'),
-    ]
-  );
-};
-
-export const signUserOpWithCreate = async (
-  userOpHash: string,
-  login: string
-): Promise<string> => {
-  console.log({ userOpHash });
-
-  const challenge = Buffer.from(userOpHash.slice(2), 'hex');
-  const encodedChallenge = base64url.encode(challenge);
-  console.log('base6url challenge', base64url.encode(challenge));
-
-  const passkey = await startRegistration({
-    rp: {
-      name: 'WebAuthn.io (Dev)',
-      id: 'localhost',
-    },
-    user: {
-      id: base64url.encode(crypto.randomUUID()),
-      name: `${login} ${new Date().toLocaleDateString('fr-FR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })}`,
-      displayName: login,
-    },
-    challenge: base64url.encode(challenge),
-    pubKeyCredParams: [
-      {
-        type: 'public-key',
-        alg: -7,
-      },
-    ],
-    timeout: 60000,
-    authenticatorSelection: {
-      // authenticatorAttachment: 'platform', // can prevent simulator from running the webauthn request
-    },
-    attestation: 'direct',
-  });
-  const credId = `0x${base64url.toBuffer(passkey.id).toString('hex')}`;
-  localStorage.setItem(`${login}_passkeyId`, credId);
-  console.log({ credId });
-  console.log('webauthn response', passkey);
-  const decodedPassKey = decodeRegistrationCredential(passkey);
-
-  console.log('decoded webauthn response', decodedPassKey);
-
-  const supportsDirectAttestation =
-    !!decodedPassKey.response.attestationObject.attStmt.sig;
-  console.log({ supportsDirectAttestation });
-
-  const pubKeyCoordinates = [
-    '0x' +
-      base64url
-        .toBuffer(
-          decodedPassKey.response.attestationObject.authData
-            .parsedCredentialPublicKey?.x || ''
-        )
-        .toString('hex'),
-    '0x' +
-      base64url
-        .toBuffer(
-          decodedPassKey.response.attestationObject.authData
-            .parsedCredentialPublicKey?.y || ''
-        )
-        .toString('hex'),
-  ];
-
-  const { payload: loginServiceData } = await fetch(environment.loginUrl, {
-    method: 'POST',
-    body: JSON.stringify({
-      login,
-      credId,
-      pubKeyCoordinates,
-    }),
-  }).then((x) => x.json());
-
-  if (supportsDirectAttestation) {
-    const ecVerifyInputs = authResponseToSigVerificationInput(
-      decodedPassKey.response.attestationObject.authData
-        .parsedCredentialPublicKey,
-      {
-        authenticatorData: decodedPassKey.response.authenticatorData!,
-        clientDataJSON: passkey.response.clientDataJSON,
-        signature: decodedPassKey.response.attestationObject.attStmt.sig!,
-      }
-    );
-    console.log('verify inputs', ecVerifyInputs);
-
-    const challengeOffsetRegex = new RegExp(
-      `(.*)${Buffer.from(encodedChallenge).toString('hex')}`
-    );
-    const challengePrefix = challengeOffsetRegex.exec(
-      base64url.toBuffer(passkey.response.clientDataJSON).toString('hex')
-    )?.[1];
-    console.log({ challengeOffsetRegex, challengePrefix });
-
-    console.log('webauthn verify inputs', [
-      SignatureTypes.WEBAUTHN_UNPACKED_WITH_LOGIN_SERVICE,
-      decodedPassKey.response.attestationObject.authData.flagsMask,
-      `0x${base64url
-        .toBuffer(passkey.response.authenticatorData!)
-        .toString('hex')}`,
-      `0x${base64url
-        .toBuffer(passkey.response.clientDataJSON)
-        .toString('hex')}`,
-      userOpHash,
-      Buffer.from(challengePrefix || '', 'hex').length,
-      ecVerifyInputs.signature[0],
-      ecVerifyInputs.signature[1],
-      loginServiceData,
-    ]);
-
-    return ethers.utils.defaultAbiCoder.encode(
-      [
-        'bytes1',
-        'bytes1',
-        'bytes',
-        'bytes',
-        'bytes',
-        'uint256',
-        'uint256',
-        'uint256',
-        'bytes',
-      ],
-      [
-        SignatureTypes.WEBAUTHN_UNPACKED_WITH_LOGIN_SERVICE,
-        decodedPassKey.response.attestationObject.authData.flagsMask,
-        `0x${base64url
-          .toBuffer(passkey.response.authenticatorData!)
-          .toString('hex')}`,
-        `0x${base64url
-          .toBuffer(passkey.response.clientDataJSON)
-          .toString('hex')}`,
-        userOpHash,
-        Buffer.from(challengePrefix || '', 'hex').length,
-        ecVerifyInputs.signature[0],
-        ecVerifyInputs.signature[1],
-        loginServiceData,
-      ]
-    );
-  }
-
-  console.log(
-    'login service inputs',
-    ethers.utils.defaultAbiCoder.decode(
-      ['bytes1', 'string', 'bytes', 'uint256[2]', 'bytes'],
-      loginServiceData
-    )
-  );
-  return loginServiceData.signature;
-};
-
-enum SignatureTypes {
-  NONE,
-  WEBAUTHN_UNPACKED,
-  LOGIN_SERVICE,
-  WEBAUTHN_UNPACKED_WITH_LOGIN_SERVICE,
-}

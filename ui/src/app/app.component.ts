@@ -1,49 +1,64 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { environment } from '../environments/environment';
+import { Component, signal } from '@angular/core';
 import { sendTransaction } from './minting';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [CommonModule],
+  styleUrl: `./app.component.scss`,
   template: `
-    <input #nameEl placeholder="name" />
-    <button (click)="call(nameEl.value)">Call!</button>
-    <button (click)="alchemyMint(nameEl.value)">Alchemy Mint!</button>
+    <input #nameEl placeholder="Please enter unique username" />
+
+    <select [value]="selectedPaymaster" (change)="onPaymasterChange($event)">
+      <option value="STACKUP">Paymaster: Stackup</option>
+      <option value="ALCHEMY">Paymaster: Alchemy</option>
+    </select>
+
+    <button (click)="mint(nameEl.value)" [disabled]="disabled">
+      Create Account and Mint NFT
+    </button>
+
+    <div>
+      <br />
+      <ul>
+        <li *ngFor="let item of statusTextList()" [innerHTML]="item"></li>
+      </ul>
+
+      @if (errorText()) {
+      <span class="error">{{ errorText() }}</span>
+      }
+    </div>
   `,
 })
 export class AppComponent {
-  call(name: string) {
-    console.log(environment.bundlerRpc);
-    sendTransaction(name, new Blob(['hello world'], { type: 'text/plain' }));
+  statusTextList = signal<string[]>([]);
+  errorText = signal('');
+  disabled: boolean = false;
+  selectedPaymaster = 'STACKUP';
+
+  async mint(name: string) {
+    this.disabled = true;
+    try {
+      const [events, receipt] = await sendTransaction(
+        name,
+        this.selectedPaymaster as any,
+        (x) => this.statusTextList.update((y) => [...y, x])
+      );
+
+      this.statusTextList.update((x) => [
+        ...x,
+        `Receipt hash: ${receipt.hash}`,
+        'Completed successfully!',
+      ]);
+    } catch (err: any) {
+      console.log(err);
+      this.errorText.set(err.message);
+    }
   }
 
-  alchemyMint(name: string) {
-    // const chain = baseGoerli;
-    // const provider = new AlchemyProvider({
-    //   chain,
-    //   rpcUrl: environment.paymasterRpc,
-    // }).withAlchemyGasManager({
-    //   policyId: '32fc1986-def9-4987-8c84-2543165a143a',
-    // });
-    // // .connect(
-    // //   (x) =>
-    // //     new LightSmartContractAccount({
-    // //       rpcClient: provider,
-    // //       owner: signer,
-    // //       chain,
-    // //       entryPointAddress: getDefaultEntryPointAddress(chain),
-    // //       factoryAddress: getDefaultLightAccountFactoryAddress(chain),
-    // //       accountAddress: provider.getAddress(),
-    // //     })
-    // // );
-    // provider.sendUserOperation(
-    //   {
-    //     target: '',
-    //     data,
-    //   },
-    //   {}
-    // );
+  onPaymasterChange(x: any) {
+    const res = x.srcElement.options[x.srcElement.selectedIndex].value;
+    this.selectedPaymaster = res;
   }
 }
