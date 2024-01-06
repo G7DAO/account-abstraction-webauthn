@@ -42,10 +42,10 @@ There are few projects which were an inspiration for starting this project. If y
 
 ### Sepolia
 
-- WebAuthnAccountFactory - https://sepolia.etherscan.io/address/0x1c831bF4656866662B04c8FED126d432a007BD08#code
-- DummyWebAuthnAccountFactory (Creates account with zero validation, just for testing) - https://sepolia.etherscan.io/address/0x97c14a5793928f224732a020aecf41e1c8d9fe2f#code
-- WebAuthn256r1 (Deployed once. WebAuthn verification logic, shared between Accounts) - https://sepolia.etherscan.io/address/0x13250cf16eec77781dcf240b067cac78f2b2adf8#writeContract
-- AvatarPack (Test ERC721 contract for minting items) - https://sepolia.etherscan.io/address/0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9#code
-- Custom Paymaster - https://sepolia.etherscan.io/address/0xD1c5ea2610b894FA66333cb5F3b512ea037ba1F0#writeContract
-- Deployer - https://sepolia.etherscan.io/address/0xaE0bDc4eEAC5E950B67C6819B118761CaAF61946
-- Entrypoint - 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789
+- WebAuthnAccountFactory - [0x1c831bF4656866662B04c8FED126d432a007BD08](https://sepolia.etherscan.io/address/0x1c831bF4656866662B04c8FED126d432a007BD08)
+- DummyWebAuthnAccountFactory (Creates account with zero validation, just for testing) - [0x97c14a5793928f224732a020aecf41e1c8d9fe2f](https://sepolia.etherscan.io/address/0x97c14a5793928f224732a020aecf41e1c8d9fe2f)
+- WebAuthn256r1 (Deployed once. WebAuthn verification logic, shared between Accounts) - [0x13250cf16eec77781dcf240b067cac78f2b2adf8](https://sepolia.etherscan.io/address/0x13250cf16eec77781dcf240b067cac78f2b2adf8)
+- AvatarPack (Test ERC721 contract for minting items) - [0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9](https://sepolia.etherscan.io/address/0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9)
+- Custom Paymaster - [0xD1c5ea2610b894FA66333cb5F3b512ea037ba1F0](https://sepolia.etherscan.io/address/0xD1c5ea2610b894FA66333cb5F3b512ea037ba1F0)
+- Deployer - [0xaE0bDc4eEAC5E950B67C6819B118761CaAF61946](https://sepolia.etherscan.io/address/0xaE0bDc4eEAC5E950B67C6819B118761CaAF61946)
+- Entrypoint - [0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789](https://sepolia.etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789)
