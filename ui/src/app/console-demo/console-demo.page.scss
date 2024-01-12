@@ -1,0 +1,13 @@
+section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  ion-item {
+    width: 250px;
+  }
+}
+
+.error {
+  color: #a52a2a;
+}

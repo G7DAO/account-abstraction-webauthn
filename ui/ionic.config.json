@@ -1,0 +1,7 @@
+{
+  "name": "ichigo-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

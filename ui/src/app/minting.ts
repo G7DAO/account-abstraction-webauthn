@@ -24,7 +24,7 @@ const CUSTOM_PAYMASTER_URL =
 export async function sendTransaction(
   loginUsername: string,
   paymaster: 'STACKUP' | 'ALCHEMY',
-  statusUpdateFn: (status: string) => void
+  statusUpdateFn: (status: string, miniInfo?: string) => void
 ): Promise<[ethers.Event[], ethers.providers.TransactionResponse]> {
   if (!loginUsername) throw Error('Login not set');
 
@@ -36,7 +36,10 @@ export async function sendTransaction(
 
   statusUpdateFn(`Selected Paymaster: ${paymaster}`);
 
-  statusUpdateFn(`Wallet address: <pre>${walletAddress}</pre>`);
+  statusUpdateFn(
+    `Wallet address: <pre>${walletAddress}</pre>`,
+    'Identified user'
+  );
 
   const userOpBuilder = new UserOperationBuilder()
     .useDefaults({
@@ -94,7 +97,7 @@ export async function sendTransaction(
 
   statusUpdateFn(`ChainId: <pre>${chainId}</pre>`);
 
-  statusUpdateFn(`Building userOp...`);
+  statusUpdateFn(`Building userOp...`, 'Building userOp');
 
   const signedUserOp = await userOpBuilder.buildOp(ENTRYPOINT_ADDRESS, chainId);
 
@@ -105,7 +108,7 @@ export async function sendTransaction(
 
   await receipt.wait();
 
-  statusUpdateFn(`confirmed. querying events...`);
+  statusUpdateFn(`confirmed. querying events...`, 'Confirmed');
 
   console.log(receipt.hash);
   console.log('confirmed');
@@ -134,7 +137,7 @@ export async function sendTransaction(
 
 const sendUserOp = async (
   userOp: IUserOperation,
-  statusUpdateFn: (status: string) => void
+  statusUpdateFn: (status: string, miniInfo?: string) => void
 ): Promise<ethers.providers.TransactionResponse> => {
   console.log('yo userOp', JSON.stringify(userOp));
   console.log('yo entrypoint', entrypointContract.address);
@@ -144,17 +147,18 @@ const sendUserOp = async (
   ]);
 
   statusUpdateFn(
-    `userOpHash: <pre>${userOpHash}</pre> waiting for the confirmatoin...`
+    `userOpHash: <pre>${userOpHash}</pre> waiting for the confirmatoin...`,
+    'Transaction sent'
   );
 
-  return waitForUserOp(userOpHash, userOp, 50, statusUpdateFn);
+  return waitForUserOp(userOpHash, userOp, 20, statusUpdateFn);
 };
 
 const waitForUserOp = async (
   userOpHash: string,
   userOp: IUserOperation,
   maxRetries = 50,
-  statusUpdateFn: (status: string) => void
+  statusUpdateFn: (status: string, miniInfo?: string) => void
 ): Promise<ethers.providers.TransactionResponse> => {
   if (maxRetries < 0) {
     throw new Error("Couldn't find the userOp broadcasted: " + userOpHash);
@@ -166,7 +170,7 @@ const waitForUserOp = async (
     lastBlock.number - 100
   );
 
-  statusUpdateFn('Checking...');
+  statusUpdateFn('Checking...', 'Checking transaction on-chain');
 
   if (events[0]) {
     const transaction = await events[0].getTransaction();

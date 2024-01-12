@@ -1,0 +1,56 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Console Demo
+    </ion-title>
+
+    <ion-checkbox slot="end"
+                  [checked]="followLogs"
+                  (ionChange)="followLogs = $event.detail.checked">
+      Follow logs
+    </ion-checkbox>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true"
+             #contentEl>
+  <section class="ion-padding">
+    <ion-item>
+      <ion-input #nameEl
+                 placeholder="Please enter unique username" />
+    </ion-item>
+
+
+    <ion-item>
+      <ion-select interface="popover"
+                  [(ngModel)]="selectedPaymaster">
+        <ion-select-option value="STACKUP">Paymaster: Stackup</ion-select-option>
+        <ion-select-option value="ALCHEMY">Paymaster: Alchemy</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-button size="small"
+                (click)="mint(nameEl.value?.toString() ?? '')"
+                [disabled]="disabled || !nameEl.value">
+      Create Account and Mint NFT
+    </ion-button>
+  </section>
+
+  <div>
+    <br />
+    <ul>
+      @for (item of statusTextList(); track item) {
+      <li [innerHTML]="item"></li>
+      }
+    </ul>
+
+    @if (errorText()) {
+    <span class="error">{{ errorText() }}</span>
+    }
+  </div>
+
+</ion-content>

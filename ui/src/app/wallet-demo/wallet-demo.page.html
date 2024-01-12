@@ -1,0 +1,63 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons>
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Ichigo Wallet - Demo
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true"
+             #contentEl>
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Ichigo Wallet - Demo</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <strong>Ready to purchase with next-gen wallet?</strong>
+    <p>We combined the latest web and crypto technologies.</p>
+    <br />
+    <br />
+
+    <div class="claimableItems">
+      <ion-card class="claimItem">
+        <div>
+          <img class="preview"
+               alt="avatar preview"
+               src="/assets/headwear2_image1.png" />
+
+
+        </div>
+        <h2>Purple Hat</h2>
+        <ion-card-content>
+          @if (!claimTxHash){
+          <ion-button color="dark"
+                      fill="outline"
+                      class="pay"
+                      size="small"
+                      (click)="claim()">
+            Claim
+          </ion-button>
+          }
+          @else {
+          <ion-button color="success"
+                      fill="outline"
+                      class="pay"
+                      size="small"
+                      [href]="'https://sepolia.etherscan.io/tx/' + claimTxHash"
+                      target="_blank">
+            Claimed | View Tx
+            <ion-icon slot="start"
+                      name="checkmark-circle-outline"></ion-icon>
+          </ion-button>
+          }
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
+</ion-content>

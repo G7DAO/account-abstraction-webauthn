@@ -1,0 +1,164 @@
+:host {
+  --background: var(--ion-color-light);
+  min-height: 85vh;
+}
+
+.pay {
+  min-width: 140px;
+
+  ion-img {
+    height: 25px;
+    margin-right: 5px;
+  }
+}
+
+ion-footer {
+  min-height: 50px;
+  background: var(--ion-color-light);
+  border-top: 1px solid var(--ion-color-light-shade);
+
+  ion-button {
+    min-width: 140px;
+  }
+
+  .amountPanel {
+    border-bottom: 1px solid var(--ion-color-light-shade);
+    margin-left: -16px;
+    margin-right: -16px;
+    margin-bottom: 15px;
+    padding-bottom: 9px;
+    margin-top: -10px;
+    text-align: left;
+    padding-left: 32px;
+    display: flex;
+    flex-direction: row;
+
+    h2 {
+      margin-top: 0;
+    }
+
+    h5 {
+      color: gray;
+      margin-bottom: 0;
+      font-size: 16px;
+    }
+
+    a.help {
+      vertical-align: bottom;
+      display: inline-block;
+      margin-bottom: -3px;
+      color: grey;
+    }
+
+    div.amount {
+      min-width: 155px;
+    }
+
+    div.info {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      align-self: center;
+      margin-left: 30px;
+      flex: 1;
+      text-align: right;
+      padding-right: 20px;
+      font-size: 14px;
+    }
+  }
+}
+
+ion-toolbar,
+ion-content {
+  --background: translarent;
+}
+
+ion-toolbar {
+  height: 64px;
+  --border-color: transparent;
+}
+
+ion-content {
+  height: 320px;
+
+  ion-card:first-of-type {
+    margin-top: 0;
+  }
+}
+
+ion-card-header {
+  padding-bottom: 3px;
+}
+
+.contractAddress {
+  ion-icon {
+    vertical-align: bottom;
+    margin-bottom: 1px;
+  }
+
+  ion-button {
+    --padding-start: 0;
+  }
+}
+
+.modalTitle {
+  margin-top: 5px;
+
+  ion-img {
+    display: inline-block;
+    height: 40px;
+    vertical-align: bottom;
+  }
+
+  ion-title {
+    font-weight: 400;
+  }
+}
+
+.nftMinting {
+  .preview {
+    max-height: 140px;
+  }
+
+  .contentLayout {
+    display: flex;
+    flex-direction: column;
+
+    ion-card-content {
+      flex: 1;
+    }
+  }
+}
+
+ion-button.confirm {
+  ion-spinner {
+    margin-top: -2px;
+    margin-bottom: -2px;
+  }
+}
+
+.claimableItems {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  .claimItem {
+    img {
+      max-height: 140px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-top: 0;
+    }
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  .nftMinting {
+    .contentLayout {
+      flex-direction: row;
+    }
+  }
+}

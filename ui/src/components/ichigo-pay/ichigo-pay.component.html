@@ -1,0 +1,131 @@
+<ion-header>
+  <ion-toolbar class="modalTitle">
+    <ion-title size="large">
+      <ion-img src="/assets/ichigo.png"></ion-img>
+      Pay
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button color="dark"
+                  (click)="cancel()">
+        <ion-icon slot="icon-only"
+                  name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-subtitle>New Account</ion-card-subtitle>
+    </ion-card-header>
+    <ion-item lines="none">
+      <ion-avatar aria-hidden="true"
+                  slot="start">
+        <img alt=""
+             src="/assets/ethereum.svg" />
+      </ion-avatar>
+
+      <ion-input label="Enter your nickname"
+                 labelPlacement="stacked"
+                 [required]="true"
+                 type="text"
+                 placeholder="Nickname"
+                 [(ngModel)]="name"></ion-input>
+
+      <ion-note slot="end">{{ data.networkName }}</ion-note>
+    </ion-item>
+  </ion-card>
+
+  <ion-card class="nftMinting">
+    <ion-card-header>
+      <ion-card-subtitle>NFT Minting</ion-card-subtitle>
+    </ion-card-header>
+
+    <div class="contentLayout">
+      <div>
+        <img class="preview"
+             alt="avatar preview"
+             [src]="data.nftMint?.imageUrl" />
+      </div>
+      <ion-card-content>
+        <ion-item lines="full">
+          <ion-input label="Name"
+                     labelPlacement="stacked"
+                     [required]="true"
+                     type="text"
+                     placeholder="Nickname"
+                     readonly
+                     [value]="data.nftMint?.name"></ion-input>
+
+        </ion-item>
+
+        <ion-item lines="full"
+                  class="contractAddress"
+                  [href]="data.nftMint?.collectionLink"
+                  target="_blank">
+
+          <ion-input readonly
+                     [value]="data.nftMint?.collectionName"
+                     label="Collection"
+                     labelPlacement="stacked"></ion-input>
+        </ion-item>
+
+
+        <ion-item lines="full"
+                  [href]="data.nftMint?.contractLink"
+                  target="_blank">
+
+          <ion-input readonly
+                     [value]="data.nftMint?.contractAddress"
+                     label="Contract Address"
+                     labelPlacement="stacked"></ion-input>
+        </ion-item>
+
+      </ion-card-content>
+    </div>
+  </ion-card>
+</ion-content>
+
+<ion-footer class="ion-padding ion-text-center">
+  <div class="amountPanel">
+    <div class="amount fill">
+      <h5>
+        Est. Total Amount
+        <a href="javascript:void(0)"
+           class="help">
+          <ion-icon name="help-circle-outline"></ion-icon>
+        </a>
+      </h5>
+
+      @if (totalPriceInCents()) {
+      <h2>{{ totalPriceInCents() / 100 | currency }}</h2>
+      }
+      @else {
+      <h2>Estimating...</h2>
+      }
+    </div>
+    <div class="info">
+      {{ message }}
+    </div>
+  </div>
+
+  @if (!isPaymentInProgress) {
+  <ion-button size="medium"
+              [disabled]="!name"
+              (click)="confirm()"
+              class="confirm">
+    <ion-icon slot="start"
+              name="finger-print-outline"></ion-icon>
+    Confirm
+  </ion-button>
+  }
+  @else {
+  <ion-button size="medium"
+              disabled
+              class="confirm">
+    <ion-spinner name="crescent"></ion-spinner>
+  </ion-button>
+  }
+</ion-footer>
