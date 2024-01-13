@@ -7,7 +7,7 @@ import ENTRYPOINT_ABI from '../abis/entrypointAbi.json';
 import FACTORY_ABI from '../abis/factoryAbi.json';
 
 export const ENTRYPOINT_ADDRESS = '0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789';
-export const FACTORY_ADDRESS = '0x1c831bF4656866662B04c8FED126d432a007BD08';
+export const FACTORY_ADDRESS = '0x97c14a5793928f224732a020aecf41e1c8d9fe2f'; // '0x1c831bF4656866662B04c8FED126d432a007BD08';
 export const AVATAR_PACK_ADDRESS = '0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9';
 
 export const provider = new BundlerJsonRpcProvider(
