@@ -13,6 +13,7 @@ export const AVATAR_PACK_ADDRESS = '0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9';
 export const provider = new BundlerJsonRpcProvider(
   'https://ethereum-sepolia.publicnode.com'
 ).setBundlerRpc(
+  // 'https://eth-sepolia.g.alchemy.com/v2/G877AttcsdLjN_XYyon926pWginvLx9L'
   'https://api.stackup.sh/v1/node/54fe8665d13ebc11341af214d62141289d4348a1fdbf72041e9ca1e4f06bd16b'
 );
 

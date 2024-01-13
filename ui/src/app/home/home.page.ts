@@ -1,8 +1,17 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { IonicModule } from '@ionic/angular';
-import { IonModal } from '@ionic/angular/standalone';
+import {
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonContent,
+  IonHeader,
+  IonModal,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 
 @Component({
@@ -10,7 +19,18 @@ import { addIcons } from 'ionicons';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [FormsModule, IonicModule, RouterModule],
+  imports: [
+    FormsModule,
+    IonHeader,
+    IonCard,
+    IonContent,
+    IonToolbar,
+    IonTitle,
+    IonCardHeader,
+    IonCardSubtitle,
+    IonCardContent,
+    RouterModule,
+  ],
 })
 export class HomePage {
   @ViewChild(IonModal) modal?: IonModal;

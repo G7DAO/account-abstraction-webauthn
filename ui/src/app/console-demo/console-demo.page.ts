@@ -1,6 +1,19 @@
 import { Component, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonicModule } from '@ionic/angular';
+import {
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonCheckbox,
+  IonContent,
+  IonHeader,
+  IonInput,
+  IonItem,
+  IonSelect,
+  IonSelectOption,
+  IonTitle,
+  IonToolbar,
+} from '@ionic/angular/standalone';
 import { sendTransaction } from '../minting';
 
 @Component({
@@ -8,7 +21,21 @@ import { sendTransaction } from '../minting';
   templateUrl: 'console-demo.page.html',
   styleUrls: ['console-demo.page.scss'],
   standalone: true,
-  imports: [FormsModule, IonicModule],
+  imports: [
+    FormsModule,
+    IonBackButton,
+    IonButton,
+    IonButtons,
+    IonCheckbox,
+    IonContent,
+    IonHeader,
+    IonInput,
+    IonItem,
+    IonSelect,
+    IonSelectOption,
+    IonTitle,
+    IonToolbar,
+  ],
 })
 export class ConsoleDemoPage {
   @ViewChild('contentEl') private content?: IonContent;

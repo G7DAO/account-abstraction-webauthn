@@ -1,7 +1,18 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
-import { ModalController } from '@ionic/angular/standalone';
+import {
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonCard,
+  IonCardContent,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonTitle,
+  IonToolbar,
+  ModalController,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   IchigoPayComponent,
@@ -13,7 +24,20 @@ import {
   templateUrl: 'wallet-demo.page.html',
   styleUrls: ['wallet-demo.page.scss'],
   standalone: true,
-  imports: [FormsModule, IonicModule, IchigoPayComponent],
+  imports: [
+    FormsModule,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonButton,
+    IonBackButton,
+    IonContent,
+    IonTitle,
+    IonCard,
+    IonCardContent,
+    IonIcon,
+    IchigoPayComponent,
+  ],
 })
 export class WalletDemoPage {
   message =
@@ -65,7 +89,9 @@ export class WalletDemoPage {
       .then(async (x) => {
         await x.present();
 
-        totalPriceInCents.set(2723);
+        setTimeout(() => {
+          totalPriceInCents.set(2723);
+        }, 1000);
 
         return x.onDidDismiss();
       });
