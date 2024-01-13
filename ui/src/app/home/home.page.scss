@@ -14,5 +14,11 @@ section {
   ion-card {
     min-width: 200px;
     max-width: 300px;
+    cursor: pointer;
+    transition: 100ms linear;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
   }
 }
