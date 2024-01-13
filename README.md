@@ -37,7 +37,7 @@ There are few projects which were an inspiration for starting this project. If y
 
 - https://github.com/zkwebauthn/webauthn-halo2
 - https://github.com/qd-qd/wallet-abstraction
-- https://github.com/tdrerup/elliptic-curve-solidity/blob/master/contracts/curves/EllipticCurve.sol (https://etherscan.io/address/0xf471789937856d80e589f5996cf8b0511ddd9de4#readContract)
+- https://github.com/tdrerup/elliptic-curve-solidity ([Contract](https://etherscan.io/address/0xf471789937856d80e589f5996cf8b0511ddd9de4#readContract))
 
 ## Test Contracts
 
