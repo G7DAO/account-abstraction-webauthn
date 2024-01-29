@@ -1,4 +1,4 @@
-# Account Abstraction + WebAuthn
+# Account Abstraction + WebAuthn (Passkeys)
 
 This is a research project to use [WebAuthn](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API) (FaceID/Fingerprint Authentication) with [Account Abstraction](https://eips.ethereum.org/EIPS/eip-4337) (ERC 4337)
 
