@@ -6,7 +6,7 @@ import {WebAuthn256r1} from "../src/WebAuthn256r1.sol";
 import {console2} from "@forge-std/console2.sol";
 import {Test} from "@forge-std/Test.sol";
 import {WebAuthnAccountFactory} from "../src/WebAuthnAccountFactory.sol";
-import {VerifyingPaymaster} from "../src/VerifyingPaymaster.sol";
+import {Paymaster} from "../src/Paymaster.sol";
 import {BaseScript} from "./Base.s.sol";
 
 contract DeployAnvil is BaseScript, Test {
@@ -25,10 +25,7 @@ contract DeployAnvil is BaseScript, Test {
 
         console2.log("webAuthnAccountFactory", address(webAuthnAccountFactory));
 
-        VerifyingPaymaster paymaster = new VerifyingPaymaster(
-            entryPoint,
-            msg.sender
-        );
+        Paymaster paymaster = new Paymaster(entryPoint, msg.sender);
         console2.log("paymaster", address(paymaster));
         console2.log("paymaster owner", msg.sender);
 

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import {Test} from "@forge-std/Test.sol";
-import {console} from "@forge-std/console.sol";
 import {WebAuthn256r1} from "./WebAuthn256r1.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import {BaseAccount} from "@account-abstraction/contracts/core/BaseAccount.sol";
@@ -149,8 +148,6 @@ contract WebAuthnAccount is
     ) internal {
         _signers[credId] = pubKeyCoordinates;
         _signersCount++;
-
-        console.log("_signersCount", _signersCount);
     }
 
     function _addFirstSignerFromLoginService(
@@ -171,35 +168,16 @@ contract WebAuthnAccount is
                 pubKeyCoordinates
             )
         );
-        console.log("-------------LOGIN SERVICE VERIFICATION---------------");
-        console.logBytes32(payload);
-        console.logBytes(serviceSignature);
-        console.logBytes32(payload.toEthSignedMessageHash());
-        console.log("loginService", loginService);
-        console.log(
-            "recovered",
-            payload.toEthSignedMessageHash().recover(serviceSignature)
-        );
-        console.log("-------------/LOGIN SERVICE VERIFICATION---------------");
         address recoveredAddress = payload.toEthSignedMessageHash().recover(
             serviceSignature
         );
-        console.log("loginService dryRun", dryRun);
 
         if (!dryRun) {
-            console.log("loginService check");
             require(
                 recoveredAddress == loginService,
                 "incorrect login service signature"
             );
         }
-
-        console.log("adding signer...", string(credId));
-        console.log(
-            "pubKeyCoordinates",
-            pubKeyCoordinates[0],
-            pubKeyCoordinates[1]
-        );
 
         _addSigner(credId, pubKeyCoordinates);
     }
@@ -233,7 +211,6 @@ contract WebAuthnAccount is
         );
 
         if (signatureType == SignatureTypes.NONE) {
-            console.log("signatureType = 0");
             bytes
                 memory simulationSignature = hex"030000000000000000000000000000000000000000000000000000000000000045000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000120000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002c000000000000000000000000000000000000000000000000000000000000000276de7996aad706bdff13af9458d927c8101ee7aa067870211c37a3a92da214fb717fb7806e6ee6f39a3bd4bc1296fc49a2ec4a24a73ef159485abbdfab8af2d58000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000a449960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d97634500000000adce000235bcc60a648b0b25f1f055030020233214ae5885adf752734b0712d27a93f40a83ae81b3d04d0a4524f4e46fdea0a50102032620012158209dca86cce5904e0094b6e86a8caa7273d0f32d49c57471ccf91baa4d7e8432cd2258207e2e3140629cebf02b40005347ed672242bdda4366e891d3acfe1f00d9bc93500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000897b2274797065223a22776562617574686e2e637265617465222c226368616c6c656e6765223a2238517170504951507a503036612d6d7763576956472d5730565267735a797a32344b6f4a58787579644430222c226f726967696e223a22687474703a2f2f6c6f63616c686f73743a34333337222c2263726f73734f726967696e223a66616c73657d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020f10aa93c840fccfd3a6be9b07168951be5b455182c672cf6e0aa095f1bb2743d00000000000000000000000000000000000000000000000000000000000001c0020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000001009dca86cce5904e0094b6e86a8caa7273d0f32d49c57471ccf91baa4d7e8432cd7e2e3140629cebf02b40005347ed672242bdda4366e891d3acfe1f00d9bc9350000000000000000000000000000000000000000000000000000000000000014000000000000000000000000000000000000000000000000000000000000000036b766e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000020233214ae5885adf752734b0712d27a93f40a83ae81b3d04d0a4524f4e46fdea000000000000000000000000000000000000000000000000000000000000000415d02932d0bbc02fbac9a1445e53b5b686fd048f9c1f697d874e40cd3693379bf0dd0db93dd107686abac7021b0a234589cc8606a50439d2174e762916164c35d1c00000000000000000000000000000000000000000000000000000000000000";
             return
@@ -245,20 +222,17 @@ contract WebAuthnAccount is
         }
 
         if (signatureType == SignatureTypes.WEBAUTHN_UNPACKED) {
-            console.log("signatureType = 1");
             return
                 _validateWebAuthnSignature(userOp.signature, userOpHash, false);
         }
 
         if (signatureType == SignatureTypes.LOGIN_SERVICE) {
-            console.log("signatureType = 2");
             return _validateLoginServiceOnlySignature(userOp.signature);
         }
 
         if (
             signatureType == SignatureTypes.WEBAUTHN_UNPACKED_WITH_LOGIN_SERVICE
         ) {
-            console.log("signatureType = 3");
             return
                 _validateWebAuthnWithLoginServiceSignature(
                     userOp.signature,

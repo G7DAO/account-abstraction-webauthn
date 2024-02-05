@@ -19,10 +19,7 @@ contract DeployFactory is BaseScript, Test {
         0x90F79bf6EB2c4f870365E785982E1f101E93b906;
 
     constructor() {
-        ENTRYPOINT_ADDRESS = vm.envOr(
-            "ENTRYPOINT",
-            0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789
-        );
+        ENTRYPOINT_ADDRESS = 0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789;
     }
 
     modifier checkEntryPointExistence() {

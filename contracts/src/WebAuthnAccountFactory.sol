@@ -5,7 +5,6 @@ import {Create2} from "@openzeppelin/contracts/utils/Create2.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {IEntryPoint} from "@account-abstraction/contracts/interfaces/IEntryPoint.sol";
 import {WebAuthnAccount} from "./WebAuthnAccount.sol";
-import {console2} from "@forge-std/console2.sol";
 
 /**
  * A sample factory contract for WebAuthnAccount
@@ -68,8 +67,6 @@ contract WebAuthnAccountFactory {
         string calldata login,
         uint256 salt
     ) public returns (WebAuthnAccount) {
-        console2.log("Creating account with login and salt...", login, salt);
-
         address addr = getAddress(login, salt);
         uint256 codeSize = addr.code.length;
         if (codeSize > 0) {
