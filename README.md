@@ -42,6 +42,9 @@ There are few projects which were an inspiration for starting this project. If y
 - https://github.com/qd-qd/wallet-abstraction
 - https://github.com/tdrerup/elliptic-curve-solidity ([Contract](https://etherscan.io/address/0xf471789937856d80e589f5996cf8b0511ddd9de4#readContract))
 
+Base Smart Wallet:
+- https://github.com/coinbase/smart-wallet
+
 Great Article:
 - https://medium.com/@poporuii/webauthn-and-passkey-key-management-for-daily-crypto-users-ea13c918c10c
 
