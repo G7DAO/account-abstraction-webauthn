@@ -18,6 +18,13 @@
   </ion-header>
 
   <div id="container">
+    @if (!!savedName) {
+    <div class="userLoginInfo">
+      Signed in as <strong>{{ savedName }}</strong>
+      <ion-button size="small" color="danger"
+                  (click)="signOut()">Sign out</ion-button>
+    </div>
+    }
     <strong>Ready to purchase with next-gen wallet?</strong>
     <p>We combined the latest web and crypto technologies.</p>
     <br />
@@ -48,7 +55,7 @@
                       fill="outline"
                       class="pay"
                       size="small"
-                      [href]="'https://sepolia.etherscan.io/tx/' + claimTxHash"
+                      [href]="'https://sepolia.basescan.org/tx/' + claimTxHash"
                       target="_blank">
             Claimed | View Tx
             <ion-icon slot="start"

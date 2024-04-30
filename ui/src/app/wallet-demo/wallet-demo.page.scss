@@ -1,3 +1,14 @@
+.userLoginInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+
+  strong {
+    margin: 10px
+  }
+}
+
 ion-content {
   --background: var(--ion-color-light);
 }
@@ -117,6 +128,8 @@ ion-toolbar {
     }
   }
 }
+
+
 
 .modalTitle {
   margin-top: 5px;

@@ -25,6 +25,8 @@ export class IchigoPayComponent {
   message = '';
   name: string = '';
 
+  savedName = '';
+
   constructor(private activeModal: ModalController) {
     addIcons({
       'close-circle-outline': '/assets/close-circle-outline.svg',
@@ -33,6 +35,16 @@ export class IchigoPayComponent {
       'shield-checkmark-outline': '/assets/shield-checkmark-outline.svg',
       'help-circle-outline': '/assets/help-circle-outline.svg',
     });
+
+    this.savedName = localStorage.getItem('savedAccountName')!;
+
+    if (this.savedName) {
+      this.name = this.savedName;
+    }
+
+    setTimeout(() => {
+      this.totalPriceInCents.set(!this.savedName ? 273 : 93);
+    }, 1000);
   }
 
   cancel() {
@@ -41,8 +53,11 @@ export class IchigoPayComponent {
 
   async confirm() {
     try {
+      localStorage.setItem('savedAccountName', this.name);
+      this.savedName = this.name;
+
       this.isPaymentInProgress = true;
-      const res = await sendTransaction(this.name, 'STACKUP', (_, x) => {
+      const res = await sendTransaction(this.name, 'ALCHEMY', (_, x) => {
         if (x !== undefined) {
           this.message = x;
         }

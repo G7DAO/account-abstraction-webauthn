@@ -45,6 +45,7 @@ export class WalletDemoPage {
   name: string = '';
 
   claimTxHash = '';
+  savedName = '';
 
   constructor(private modal: ModalController) {
     addIcons({
@@ -54,60 +55,67 @@ export class WalletDemoPage {
       'shield-checkmark-outline': '/assets/shield-checkmark-outline.svg',
       'help-circle-outline': '/assets/help-circle-outline.svg',
     });
+
+    this.savedName = localStorage.getItem('savedAccountName')!;
+  }
+
+  signOut() {
+    localStorage.removeItem('savedAccountName');
+    this.savedName = '';
   }
 
   async claim() {
-    const totalPriceInCents = signal(0);
+    try {
+      const totalPriceInCents = signal(0);
 
-    const result = await this.modal
-      .create({
-        initialBreakpoint: 1,
-        breakpoints: [0, 0.5, 1],
-        backdropDismiss: false,
-        cssClass: 'payModal',
+      const result = await this.modal
+        .create({
+          initialBreakpoint: 1,
+          breakpoints: [0, 0.5, 1],
+          backdropDismiss: false,
+          cssClass: 'payModal',
 
-        component: IchigoPayComponent,
-        componentProps: {
-          totalPriceInCents,
+          component: IchigoPayComponent,
+          componentProps: {
+            totalPriceInCents,
 
-          data: {
-            networkName: 'Sepolia',
+            data: {
+              networkName: 'Sepolia',
 
-            nftMint: {
-              name: 'Purple Hat',
-              collectionName: 'Game7 Avatar',
-              collectionLink: 'https://gov.game7.io',
-              imageUrl: '/assets/headwear2_image1.png',
+              nftMint: {
+                name: 'Purple Hat',
+                collectionName: 'Game7 Avatar',
+                collectionLink: 'https://gov.game7.io',
+                imageUrl: '/assets/headwear2_image1.png',
 
-              contractAddress: '0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9',
-              contractLink:
-                'https://sepolia.etherscan.io/address/0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9',
-            },
-          } as PayData,
-        },
-      })
-      .then(async (x) => {
-        await x.present();
+                contractAddress: '0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9',
+                contractLink:
+                  'https://sepolia.basescan.org/address/0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9',
+              },
+            } as PayData,
+          },
+        })
+        .then(async (x) => {
+          await x.present();
 
-        setTimeout(() => {
-          totalPriceInCents.set(2723);
-        }, 1000);
+          return x.onDidDismiss();
+        });
 
-        return x.onDidDismiss();
-      });
+      if (result.role === 'cancel') {
+        return;
+      }
 
-    if (result.role === 'cancel') {
-      return;
-    }
+      if (result.role === 'error') {
+        alert(result.data.message);
+        return;
+      }
 
-    if (result.role === 'error') {
-      alert(result.data.message);
-      return;
-    }
-
-    // Success
-    if (result.role === 'paid') {
-      this.claimTxHash = result.data.txHash;
+      // Success
+      if (result.role === 'paid') {
+        this.claimTxHash = result.data.txHash;
+      }
+    } finally {
+      this.savedName = localStorage.getItem('savedAccountName')!;
     }
   }
 }

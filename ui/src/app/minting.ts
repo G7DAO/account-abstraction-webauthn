@@ -62,14 +62,14 @@ export async function sendTransaction(
       paymaster === 'STACKUP'
         ? // >> Stackup Paymaster
           Presets.Middleware.verifyingPaymaster(
-            'https://api.stackup.sh/v1/paymaster/54fe8665d13ebc11341af214d62141289d4348a1fdbf72041e9ca1e4f06bd16b',
+            'https://api.stackup.sh/v1/paymaster/de426c69f9a0021769c32376133f2bad3c563fd4b7e88d755dbf75099e0a4f68',
             { type: 'payg' }
           )
         : // >> Aclhemy Paymaster
           resolveAlchemyGasAndPaymasterData(
             ENTRYPOINT_ADDRESS,
-            'https://eth-sepolia.g.alchemy.com/v2/G877AttcsdLjN_XYyon926pWginvLx9L',
-            '9cef39a1-c45e-46d0-bf50-b977875579d2',
+            'https://base-sepolia.g.alchemy.com/v2/JOMsB_RG7ymuGmGM1NqlFRXuwYJ1E1Yh',
+            'ae7829c6-25de-4150-9cc8-274d53bf209a',
             { preVerificationGas: { percentage: 120 } }
           )
     )
