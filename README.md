@@ -61,3 +61,13 @@ Great Article:
 | Custom Paymaster                                                                     | [0xD1c5ea2610b894FA66333cb5F3b512ea037ba1F0](https://sepolia.etherscan.io/address/0xD1c5ea2610b894FA66333cb5F3b512ea037ba1F0) |
 | Deployer                                                                             | [0xaE0bDc4eEAC5E950B67C6819B118761CaAF61946](https://sepolia.etherscan.io/address/0xaE0bDc4eEAC5E950B67C6819B118761CaAF61946) |
 | Entrypoint                                                                           | [0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789](https://sepolia.etherscan.io/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789) |
+
+
+### Base Sepolia
+
+| Description                                                                          | Address                                                                                                                       |
+| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| WebAuthnAccountFactory                                                               | [0x1240FA2A84dd9157a0e76B5Cfe98B1d52268B264](https://sepolia.basescan.org/address/0x1240FA2A84dd9157a0e76B5Cfe98B1d52268B264) |
+| WebAuthn256r1 (Deployed once. WebAuthn verification logic, shared between Accounts)  | [0x8Ad159a275AEE56fb2334DBb69036E9c7baCEe9b](https://sepolia.basescan.org/address/0x8Ad159a275AEE56fb2334DBb69036E9c7baCEe9b) |
+| AvatarPack (Test ERC721 contract for minting items)                                  | [0x99c0561ffA05B44ab683720A83F88b318CcBa2dD](https://sepolia.basescan.org/address/0x99c0561ffA05B44ab683720A83F88b318CcBa2dD) |
+| Entrypoint                                                                           | [0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789](https://sepolia.basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789) |
