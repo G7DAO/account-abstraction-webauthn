@@ -1,3 +1,12 @@
+.ezt {
+  min-height: 142px;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Black Ops One", system-ui;
+}
+
 .userLoginInfo {
   display: flex;
   align-items: center;
@@ -25,9 +34,15 @@
       justify-content: center;
       flex-direction: row;
 
+      .title {
+        font-size: 9px;
+        font-weight: bold;
+      }
+
       .item {
-        min-width: 50px;
+        min-width: 70px;
         min-height: 50px;
+        padding: 5px;
         display: flex;
         align-items: center;
         justify-content: center;

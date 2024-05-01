@@ -37,10 +37,31 @@
       <div class="tokens">
         <h3>Tokens owned</h3>
         <div class="itemsContainer">
+          @if (ezTokens) {
+          <div>
+            <div class="item"
+                 (click)="openERC20Details()">{{ ezTokens }}xEZ</div>
+            <div class="title">
+              ERC-20
+            </div>
+            <ion-button size="small"
+                        [disabled]="transferingERC20"
+                        (click)="transferERC20()">
+              @if (transferingERC20){
+              <ion-spinner name="crescent"></ion-spinner>
+              } @else{
+              Send
+              }
+            </ion-button>
+          </div>
+          }
           @for (item of ownedTokenIds; track item) {
           <div>
             <div class="item"
-                 (click)="openTokenDetails(item)">{{ item }}</div>
+                 (click)="openTokenDetails(item)">#{{ item }}</div>
+            <div class="title">
+              ERC-721
+            </div>
             <ion-button size="small"
                         [disabled]="transferingTokenId === item"
                         (click)="transfer(item)">
@@ -70,6 +91,22 @@
 
     <div class="claimableItems">
       <ion-card class="claimItem">
+        <div class="ezt">
+          10x EZ
+        </div>
+        <h2>EZ Token</h2>
+        <ion-card-content>
+          <ion-button color="dark"
+                      fill="outline"
+                      class="pay"
+                      size="small"
+                      (click)="claimERC20()">
+            Claim
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+
+      <ion-card class="claimItem">
         <div>
           <img class="preview"
                alt="avatar preview"
@@ -84,7 +121,7 @@
                       fill="outline"
                       class="pay"
                       size="small"
-                      (click)="claim()">
+                      (click)="claimNFT()">
             Claim
           </ion-button>
           }

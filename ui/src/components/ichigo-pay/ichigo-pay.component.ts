@@ -57,11 +57,17 @@ export class IchigoPayComponent {
       this.savedName = this.name;
 
       this.isPaymentInProgress = true;
-      const res = await ichigoSdk.mintNFT(this.name, 'ALCHEMY', (_, x) => {
-        if (x !== undefined) {
-          this.message = x;
-        }
-      });
+      const res = this.data.erc20Mint
+        ? await ichigoSdk.mintERC20(this.name, 'ALCHEMY', (_, x) => {
+            if (x !== undefined) {
+              this.message = x;
+            }
+          })
+        : await ichigoSdk.mintERC721(this.name, 'ALCHEMY', (_, x) => {
+            if (x !== undefined) {
+              this.message = x;
+            }
+          });
 
       this.activeModal?.dismiss(
         {
@@ -89,6 +95,14 @@ export class IchigoPayComponent {
 export type PayData = {
   networkName: string;
   networkLogoUrl: string;
+
+  erc20Mint?: {
+    name: string;
+    contractAddress: string;
+    count: number;
+
+    contractLink?: string;
+  };
 
   nftMint?: {
     name: string;

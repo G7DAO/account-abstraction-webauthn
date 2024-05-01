@@ -12,13 +12,19 @@ import {
   IonIcon,
   IonTitle,
   IonToolbar,
-  ModalController, IonSpinner } from '@ionic/angular/standalone';
+  ModalController,
+  IonSpinner,
+} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   IchigoPayComponent,
   type PayData,
 } from '../../components/ichigo-pay/ichigo-pay.component';
-import { avatarPackContract, walletFactoryContract } from '../contracts';
+import {
+  avatarPackContract,
+  ezTokenContract,
+  walletFactoryContract,
+} from '../contracts';
 import { ichigoSdk } from '../sdk';
 
 @Component({
@@ -26,7 +32,8 @@ import { ichigoSdk } from '../sdk';
   templateUrl: 'wallet-demo.page.html',
   styleUrls: ['wallet-demo.page.scss'],
   standalone: true,
-  imports: [IonSpinner,
+  imports: [
+    IonSpinner,
     FormsModule,
     IonHeader,
     IonToolbar,
@@ -50,7 +57,9 @@ export class WalletDemoPage {
   savedName = '';
   savedUserAddress = '';
   ownedTokenIds: number[] = [];
+  ezTokens = 0;
   transferingTokenId = 0;
+  transferingERC20 = false;
 
   constructor(private modal: ModalController, private alert: AlertController) {
     addIcons({
@@ -67,7 +76,12 @@ export class WalletDemoPage {
 
     if (this.savedName) {
       this.savedUserAddress = await this.getUserAddress(this.savedName);
-      this.ownedTokenIds = await this.loadOwnedNFTs(this.savedUserAddress);
+      this.loadOwnedNFTs(this.savedUserAddress).then(
+        (x) => (this.ownedTokenIds = x)
+      );
+      this.loadOwnedEZTs(this.savedUserAddress).then(
+        (x) => (this.ezTokens = x)
+      );
     }
   }
 
@@ -91,7 +105,12 @@ export class WalletDemoPage {
       this.savedName = username;
       localStorage.setItem('savedAccountName', username);
 
-      this.ownedTokenIds = await this.loadOwnedNFTs(this.savedUserAddress);
+      this.loadOwnedNFTs(this.savedUserAddress).then(
+        (x) => (this.ownedTokenIds = x)
+      );
+      this.loadOwnedEZTs(this.savedUserAddress).then(
+        (x) => (this.ezTokens = x)
+      );
     }
   }
 
@@ -115,7 +134,7 @@ export class WalletDemoPage {
 
     this.transferingTokenId = item;
     const transferRes = await ichigoSdk
-      .transferNFT(
+      .transferERC721(
         this.savedUserAddress,
         this.savedName,
         toAddress,
@@ -127,7 +146,47 @@ export class WalletDemoPage {
 
     console.log(transferRes);
 
-    this.ownedTokenIds = await this.loadOwnedNFTs(this.savedUserAddress);
+    this.loadOwnedNFTs(this.savedUserAddress).then(
+      (x) => (this.ownedTokenIds = x)
+    );
+    this.loadOwnedEZTs(this.savedUserAddress).then((x) => (this.ezTokens = x));
+  }
+
+  async transferERC20() {
+    const alert = await this.alert.create({
+      header: `Send EZ Token to`,
+      inputs: [
+        { name: 'toAddress', placeholder: 'walletAddress' },
+        { name: 'count', placeholder: 'count' },
+      ],
+      buttons: [{ text: 'Send' }],
+    });
+    alert.present();
+
+    const res = await alert.onDidDismiss();
+
+    const toAddress = res.data?.values?.toAddress;
+    const count = Number(res.data?.values?.count);
+    console.log({ toAddress, count });
+
+    this.transferingERC20 = true;
+    const transferRes = await ichigoSdk
+      .transferERC20(
+        this.savedUserAddress,
+        this.savedName,
+        toAddress,
+        Number(count),
+        'ALCHEMY',
+        () => {}
+      )
+      .finally(() => (this.transferingERC20 = false));
+
+    console.log(transferRes);
+
+    this.loadOwnedNFTs(this.savedUserAddress).then(
+      (x) => (this.ownedTokenIds = x)
+    );
+    this.loadOwnedEZTs(this.savedUserAddress).then((x) => (this.ezTokens = x));
   }
 
   openTokenDetails(item: number) {
@@ -136,7 +195,77 @@ export class WalletDemoPage {
     );
   }
 
-  async claim() {
+  openERC20Details() {
+    window.open(
+      `https://sepolia.basescan.org/address/0xBc78b7b71739F5AD641050Ea0AC17487ceA79637`
+    );
+  }
+
+  async claimERC20() {
+    try {
+      const totalPriceInCents = signal(0);
+
+      const result = await this.modal
+        .create({
+          initialBreakpoint: 1,
+          breakpoints: [0, 0.5, 1],
+          backdropDismiss: false,
+          cssClass: 'payModal',
+
+          component: IchigoPayComponent,
+          componentProps: {
+            totalPriceInCents,
+
+            data: {
+              networkName: 'Sepolia',
+
+              erc20Mint: {
+                name: 'EZ Token',
+                count: 10,
+
+                contractAddress: '0xBc78b7b71739F5AD641050Ea0AC17487ceA79637',
+                contractLink:
+                  'https://sepolia.basescan.org/address/0xBc78b7b71739F5AD641050Ea0AC17487ceA79637',
+              },
+            } as PayData,
+          },
+        })
+        .then(async (x) => {
+          await x.present();
+
+          return x.onDidDismiss();
+        });
+
+      if (result.role === 'cancel') {
+        return;
+      }
+
+      if (result.role === 'error') {
+        alert(result.data.message);
+        return;
+      }
+
+      // Success
+      if (result.role === 'paid') {
+        this.claimTxHash = result.data.txHash;
+      }
+    } finally {
+      this.savedName = localStorage.getItem('savedAccountName')!;
+
+      if (this.savedName) {
+        this.savedUserAddress = await this.getUserAddress(this.savedName);
+
+        this.loadOwnedNFTs(this.savedUserAddress).then(
+          (x) => (this.ownedTokenIds = x)
+        );
+        this.loadOwnedEZTs(this.savedUserAddress).then(
+          (x) => (this.ezTokens = x)
+        );
+      }
+    }
+  }
+
+  async claimNFT() {
     try {
       const totalPriceInCents = signal(0);
 
@@ -191,7 +320,13 @@ export class WalletDemoPage {
 
       if (this.savedName) {
         this.savedUserAddress = await this.getUserAddress(this.savedName);
-        this.ownedTokenIds = await this.loadOwnedNFTs(this.savedUserAddress);
+
+        this.loadOwnedNFTs(this.savedUserAddress).then(
+          (x) => (this.ownedTokenIds = x)
+        );
+        this.loadOwnedEZTs(this.savedUserAddress).then(
+          (x) => (this.ezTokens = x)
+        );
       }
     }
   }
@@ -205,22 +340,17 @@ export class WalletDemoPage {
     return res;
   }
 
+  async loadOwnedEZTs(walletAddress: string) {
+    const res = await ezTokenContract.callStatic['balanceOf'](walletAddress);
+    console.log('userTokens', res);
+    return Number(res);
+  }
+
   async loadOwnedNFTs(walletAddress: string) {
     const res = await avatarPackContract.callStatic['userTokens'](
       walletAddress
     );
     console.log('userTokens', res);
     return res;
-  }
-
-  async refreshData() {
-    this.savedName = localStorage.getItem('savedAccountName')!;
-    this.ownedTokenIds = [];
-    this.savedUserAddress = '';
-
-    if (this.savedName) {
-      this.savedUserAddress = await this.getUserAddress(this.savedName);
-      this.ownedTokenIds = await this.loadOwnedNFTs(this.savedUserAddress);
-    }
   }
 }

@@ -49,7 +49,7 @@ export class ConsoleDemoPage {
   async mint(name: string) {
     this.disabled = true;
     try {
-      const [events, receipt] = await ichigoSdk.mintNFT(
+      const [events, receipt] = await ichigoSdk.mintERC721(
         name,
         this.selectedPaymaster as any,
         (x) => {
