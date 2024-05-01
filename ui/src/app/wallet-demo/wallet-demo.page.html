@@ -20,9 +20,47 @@
   <div id="container">
     @if (!!savedName) {
     <div class="userLoginInfo">
-      Signed in as <strong>{{ savedName }}</strong>
-      <ion-button size="small" color="danger"
-                  (click)="signOut()">Sign out</ion-button>
+      <div class="usernameSection">
+        Viewing as <strong>{{ savedName?.toLowerCase() }}</strong>
+
+        <ion-button size="small"
+                    color="danger"
+                    (click)="signOut()">Sign out</ion-button>
+      </div>
+      <div>
+        @if (savedUserAddress) {
+        <a [href]="'https://sepolia.basescan.org/address/' + savedUserAddress + '#tokentxnsErc721'"
+           target="_blank">{{ savedUserAddress }}</a>
+        }
+      </div>
+      @if (ownedTokenIds.length){
+      <div class="tokens">
+        <h3>Tokens owned</h3>
+        <div class="itemsContainer">
+          @for (item of ownedTokenIds; track item) {
+          <div>
+            <div class="item"
+                 (click)="openTokenDetails(item)">{{ item }}</div>
+            <ion-button size="small"
+                        [disabled]="transferingTokenId === item"
+                        (click)="transfer(item)">
+              @if (transferingTokenId === item){
+              <ion-spinner name="crescent"></ion-spinner>
+              } @else{
+              Send
+              }
+            </ion-button>
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="userLoginInfo">
+      <ion-button size="small"
+                  color="secondary"
+                  (click)="signIn()">Select user</ion-button>
     </div>
     }
     <strong>Ready to purchase with next-gen wallet?</strong>

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { sendTransaction } from 'src/app/minting';
+import { ichigoSdk } from '../../app/sdk';
 
 @Component({
   selector: 'app-ichigo-pay',
@@ -57,7 +57,7 @@ export class IchigoPayComponent {
       this.savedName = this.name;
 
       this.isPaymentInProgress = true;
-      const res = await sendTransaction(this.name, 'ALCHEMY', (_, x) => {
+      const res = await ichigoSdk.mintNFT(this.name, 'ALCHEMY', (_, x) => {
         if (x !== undefined) {
           this.message = x;
         }

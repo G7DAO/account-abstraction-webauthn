@@ -6,21 +6,41 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract AvatarPack is ERC721, Ownable {
     uint256 public lastTokenId = 0;
-    mapping(uint256 => bytes) public metadata;
 
     constructor() ERC721("AvatarPack", "JAP") {}
 
     function mint() external returns (uint256 tokenId) {
         lastTokenId++;
         _safeMint(msg.sender, lastTokenId);
-        metadata[lastTokenId] = "__MOCK__";
         return lastTokenId;
     }
 
     function tokenURI(
         uint256 tokenId
     ) public view virtual override returns (string memory) {
-        _requireMinted(tokenId);
-        return string(abi.encodePacked("ipfs://", metadata[tokenId]));
+        return string(abi.encodePacked("ipfs://", tokenId));
+    }
+
+    function userTokens(address userWallet) public view returns (uint256[] memory) {
+        uint256 balance = this.balanceOf(userWallet);
+        if (balance == 0) {
+            return new uint256[](0);
+        }
+        
+        uint256[] memory res = new uint256[](balance);
+        uint256 counter = 0;
+
+        for (uint256 i = 1; i <= lastTokenId; i++) {
+            if (this.ownerOf(i) == userWallet) {
+                res[counter] = i;
+                counter++;
+            }
+
+            if (counter == balance) {
+                break;
+            }
+        }
+
+        return res;
     }
 }

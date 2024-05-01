@@ -3,9 +3,52 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 30px;
+  flex-direction: column;
+
+  .usernameSection {
+    display: flex;
+    align-items: center;
+  }
 
   strong {
-    margin: 10px
+    margin: 10px;
+  }
+
+  .tokens {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+
+    .itemsContainer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+
+      .item {
+        min-width: 50px;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 5px;
+
+        border: 1px solid silver;
+        background: white;
+        border-radius: 3px;
+        font-size: 30px;
+
+        font-family: "Black Ops One", system-ui;
+        font-weight: 400;
+        font-style: normal;
+      }
+
+      ion-button {
+        ion-spinner {
+          max-height: 18px;
+        }
+      }
+    }
   }
 }
 
@@ -128,8 +171,6 @@ ion-toolbar {
     }
   }
 }
-
-
 
 .modalTitle {
   margin-top: 5px;

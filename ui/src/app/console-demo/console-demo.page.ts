@@ -14,7 +14,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { sendTransaction } from '../minting';
+import { ichigoSdk } from '../sdk';
 
 @Component({
   selector: 'app-console-demo',
@@ -43,13 +43,13 @@ export class ConsoleDemoPage {
   statusTextList = signal<string[]>([]);
   errorText = signal('');
   disabled: boolean = false;
-  selectedPaymaster = 'STACKUP';
+  selectedPaymaster = 'ALCHEMY';
   followLogs = true;
 
   async mint(name: string) {
     this.disabled = true;
     try {
-      const [events, receipt] = await sendTransaction(
+      const [events, receipt] = await ichigoSdk.mintNFT(
         name,
         this.selectedPaymaster as any,
         (x) => {

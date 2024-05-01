@@ -69,5 +69,5 @@ Great Article:
 | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | WebAuthnAccountFactory                                                               | [0x1240FA2A84dd9157a0e76B5Cfe98B1d52268B264](https://sepolia.basescan.org/address/0x1240FA2A84dd9157a0e76B5Cfe98B1d52268B264) |
 | WebAuthn256r1 (Deployed once. WebAuthn verification logic, shared between Accounts)  | [0x8Ad159a275AEE56fb2334DBb69036E9c7baCEe9b](https://sepolia.basescan.org/address/0x8Ad159a275AEE56fb2334DBb69036E9c7baCEe9b) |
-| AvatarPack (Test ERC721 contract for minting items)                                  | [0x99c0561ffA05B44ab683720A83F88b318CcBa2dD](https://sepolia.basescan.org/address/0x99c0561ffA05B44ab683720A83F88b318CcBa2dD) |
+| AvatarPack (Test ERC721 contract for minting items)                                  | [0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1](https://sepolia.basescan.org/address/0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1) |
 | Entrypoint                                                                           | [0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789](https://sepolia.basescan.org/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789) |
