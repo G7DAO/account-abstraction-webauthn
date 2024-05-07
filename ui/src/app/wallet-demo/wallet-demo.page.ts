@@ -22,6 +22,7 @@ import {
 } from '../../components/ichigo-pay/ichigo-pay.component';
 import {
   avatarPackContract,
+  EZ_TOKEN_ADDRESS,
   ezTokenContract,
   walletFactoryContract,
 } from '../contracts';
@@ -197,7 +198,7 @@ export class WalletDemoPage {
 
   openERC20Details() {
     window.open(
-      `https://sepolia.basescan.org/address/0xBc78b7b71739F5AD641050Ea0AC17487ceA79637`
+      `https://sepolia.basescan.org/address/${EZ_TOKEN_ADDRESS}`
     );
   }
 
