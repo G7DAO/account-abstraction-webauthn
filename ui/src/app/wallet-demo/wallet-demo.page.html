@@ -33,7 +33,7 @@
            target="_blank">{{ savedUserAddress }}</a>
         }
       </div>
-      @if (ownedTokenIds.length){
+      @if (ownedTokenIds.length || ezTokens > 0) {
       <div class="tokens">
         <h3>Tokens owned</h3>
         <div class="itemsContainer">
