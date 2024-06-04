@@ -218,7 +218,7 @@ export class WalletDemoPage {
             totalPriceInCents,
 
             data: {
-              networkName: 'Sepolia',
+              networkName: 'Base Sepolia',
 
               erc20Mint: {
                 name: 'EZ Token',
@@ -282,7 +282,7 @@ export class WalletDemoPage {
             totalPriceInCents,
 
             data: {
-              networkName: 'Sepolia',
+              networkName: 'Base Sepolia',
 
               nftMint: {
                 name: 'Purple Hat',
