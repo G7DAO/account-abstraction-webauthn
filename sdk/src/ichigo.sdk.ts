@@ -112,14 +112,17 @@ export class IchigoSDK {
         ? erc20Abi
         : props.abi;
 
-    return this.call({
-      contractAddress,
-      fnName: 'mint',
-      values: () => values,
-      username,
-      abi,
-      statusUpdateFn,
-    });
+    return this.batchCall(
+      [
+        {
+          contractAddress,
+          fnName: 'mint',
+          args: () => values,
+          abi,
+        },
+      ],
+      { username, statusUpdateFn }
+    );
   }
 
   async transfer(
@@ -146,33 +149,34 @@ export class IchigoSDK {
         ? props.count
         : 0;
 
-    return this.call({
-      contractAddress,
-      fnName: props.type === 'ERC20' ? 'transfer' : 'transferFrom',
-      values: (walletAddress) =>
-        props.type === 'ERC20'
-          ? [toAddress, id]
-          : [walletAddress, toAddress, id],
-
-      username,
-      abi,
-      statusUpdateFn,
-    });
+    return this.batchCall(
+      [
+        {
+          contractAddress,
+          fnName: props.type === 'ERC20' ? 'transfer' : 'transferFrom',
+          args: (walletAddress) =>
+            props.type === 'ERC20'
+              ? [toAddress, id]
+              : [walletAddress, toAddress, id],
+          abi,
+        },
+      ],
+      { username, statusUpdateFn }
+    );
   }
 
-  async call(props: {
-    contractAddress: string;
-    fnName: string;
-    values: (walletAddress: string) => any[];
-    abi: any;
-    username?: string;
-    statusUpdateFn?: (status: string, miniInfo?: string) => void;
-  }): Promise<[ethers.Event[], ethers.providers.TransactionResponse]> {
+  async batchCall(
+    ops: CallOp[],
+    props: {
+      username?: string;
+      statusUpdateFn?: (status: string, miniInfo?: string) => void;
+    }
+  ): Promise<[ethers.Event[], ethers.providers.TransactionResponse]> {
     const username = this.getUsername(props.username);
 
     const statusUpdateFn = props.statusUpdateFn;
 
-    const walletAddress = await this.getWalletAddress(username)
+    const walletAddress = await this.getWalletAddress(username);
     // console.log('walletAddress', walletAddress);
 
     statusUpdateFn?.(`Selected Paymaster: ${this.options.paymaster.type}`);
@@ -182,10 +186,8 @@ export class IchigoSDK {
       'Identified user'
     );
 
-    const contract = new Contract(
-      props.contractAddress,
-      props.abi,
-      this.provider
+    const contracts = ops.map(
+      (x) => new Contract(x.contractAddress, x.abi, this.provider)
     );
 
     const userOpBuilder = new UserOperationBuilder()
@@ -229,21 +231,17 @@ export class IchigoSDK {
 
       .useMiddleware(resolveWebAuthnSignature(LOGIN_URL, username))
       .setCallData(
-        webauthnAccountAbi.encodeFunctionData('execute', [
-          contract.address,
-          0,
-          contract.interface.encodeFunctionData(
-            props.fnName,
-            props.values(walletAddress)
+        webauthnAccountAbi.encodeFunctionData('executeBatch', [
+          ops.map((x) => x.contractAddress),
+          ops.map((x) => x.sendWei ?? 0),
+          ops.map((x, i) =>
+            contracts[i].interface.encodeFunctionData(
+              x.fnName,
+              x.args?.(walletAddress) ?? []
+            )
           ),
         ])
       );
-
-    console.log({ username, walletAddress }, [
-      contract.address,
-      0,
-      [props.fnName, props.values(walletAddress)],
-    ]);
 
     // Build and sign userOp
     const { chainId } = await this.provider.getNetwork();
@@ -271,8 +269,11 @@ export class IchigoSDK {
     // console.log(receipt.hash);
     // console.log('confirmed');
     // console.log({ receipt });
-    const events = await contract.queryFilter(
-      contract.filters['Transfer'](ethers.constants.AddressZero, walletAddress),
+    const events = await contracts[0].queryFilter(
+      contracts[0].filters['Transfer'](
+        ethers.constants.AddressZero,
+        walletAddress
+      ),
       receipt.blockNumber
     );
     // console.log({ events });
@@ -355,3 +356,11 @@ export class IchigoSDK {
     return username;
   }
 }
+
+type CallOp = {
+  contractAddress: string;
+  abi: any;
+  fnName: string;
+  args?: (walletAddress: string) => any[];
+  sendWei?: number;
+};
