@@ -4,10 +4,15 @@ This is a research project to use [WebAuthn](https://developer.mozilla.org/en-US
 
 ![AA WebAuthn Flow](https://github.com/G7DAO/account-abstraction-webauthn/assets/1698274/dcbdb87b-1fbc-4d6d-8dda-ebe8d3431a8b)
 
+## SDK
+[npm: ichigo-sdk](https://www.npmjs.com/package/ichigo-sdk)
+
 ## Goals
 
 - Simplify user onboarding flow for blockchain projects
 - Make blockchain accessible to millions of new users, with no friction
+
+
 
 ## Vision
 

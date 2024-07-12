@@ -21,12 +21,23 @@ Few important notes:
 - `username` is connected to the specific `Passkey`. The user who owns the `Passkey`, owns the account.
 - AA wallet is created on the first write operation. However you can always get the wallet address by `username`.
 
+## Current limitations
+
+* Chain: `Base Sepolia`
+* Browsers: `Chrome`, `Brave`
+
 ## Initialization
 
 Using Alchemy paymaster and bundler:
 
 ```ts
 import { IchigoSDK } from "ichigo-sdk";
+
+/**
+ * You can get RPC URL and PolicyID from Alchemy Dashboard:
+ * https://dashboard.alchemy.com/apps
+ * https://dashboard.alchemy.com/gas-manager
+ */
 
 const RPC_URL =
   "https://base-sepolia.g.alchemy.com/v2/JOMsB_RG7ymuGmGM1NqlFRXuwYJ1E1Yh";
