@@ -1,0 +1,1 @@
+{"version":3,"file":"resolveNonce.js","sourceRoot":"","sources":["../../../../src/presets/resolveNonce.ts"],"names":[],"mappings":"AAGA,MAAM,CAAC,MAAM,YAAY,GACvB,CACE,kBAAmC,EACnC,aAAqB,EACM,EAAE,CAC/B,KAAK,EAAE,GAAG,EAAE,EAAE;IACZ,MAAM,KAAK,GAAG,MAAM,kBAAkB,CAAC,UAAU,CAAC,CAAC,aAAa,EAAE,CAAC,CAAC,CAAC;IAErE,GAAG,CAAC,EAAE,CAAC,KAAK,GAAG,KAAK,CAAC;AACvB,CAAC,CAAC"}

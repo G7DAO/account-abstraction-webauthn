@@ -1,0 +1,23 @@
+{
+  "name": "ichigo-sdk",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "private": false,
+  "dependencies": {
+    "@peculiar/asn1-ecc": "^2.3.8",
+    "@peculiar/asn1-schema": "^2.3.8",
+    "@peculiar/asn1-x509": "^2.3.8",
+    "@simplewebauthn/browser": "^10.0.0",
+    "@simplewebauthn/typescript-types": "^8.3.4",
+    "base64url": "^3.0.1",
+    "buffer": "^6.0.3",
+    "cbor-x": "^1.5.9",
+    "ethers": "^5.7.2",
+    "userop": "^0.3.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3"
+  }
+}
