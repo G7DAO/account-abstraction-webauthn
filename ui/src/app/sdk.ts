@@ -10,13 +10,14 @@ import {
 
 import {
   ENTRYPOINT_ADDRESS,
-  avatarPackContract,
+  erc721Contract,
   entrypointContract,
   ezTokenContract,
   provider,
   walletFactoryContract,
   webauthnAccountAbi,
 } from './contracts';
+import { IchigoSDK } from './ichigo.sdk';
 
 const LOGIN_URL = 'https://webauthn-server.deno.dev/login';
 const CUSTOM_PAYMASTER_URL =
@@ -89,9 +90,9 @@ const mintERC721 = async (
     .useMiddleware(resolveWebAuthnSignature(LOGIN_URL, loginUsername))
     .setCallData(
       webauthnAccountAbi.encodeFunctionData('execute', [
-        avatarPackContract.address,
+        erc721Contract.address,
         0,
-        avatarPackContract.interface.encodeFunctionData('mint', []),
+        erc721Contract.interface.encodeFunctionData('mint', []),
       ])
     );
 
@@ -116,8 +117,8 @@ const mintERC721 = async (
   console.log(receipt.hash);
   console.log('confirmed');
   console.log({ receipt });
-  const events = await avatarPackContract.queryFilter(
-    avatarPackContract.filters['Transfer'](
+  const events = await erc721Contract.queryFilter(
+    erc721Contract.filters['Transfer'](
       ethers.constants.AddressZero,
       walletAddress
     ),
@@ -228,8 +229,8 @@ const mintERC20 = async (
   console.log(receipt.hash);
   console.log('confirmed');
   console.log({ receipt });
-  const events = await avatarPackContract.queryFilter(
-    avatarPackContract.filters['Transfer'](
+  const events = await erc721Contract.queryFilter(
+    erc721Contract.filters['Transfer'](
       ethers.constants.AddressZero,
       walletAddress
     ),
@@ -297,9 +298,9 @@ const transferERC721 = async (
     .useMiddleware(resolveWebAuthnSignature(LOGIN_URL, loginUsername))
     .setCallData(
       webauthnAccountAbi.encodeFunctionData('execute', [
-        avatarPackContract.address,
+        erc721Contract.address,
         0,
-        avatarPackContract.interface.encodeFunctionData('transferFrom', [
+        erc721Contract.interface.encodeFunctionData('transferFrom', [
           walletAddress,
           toAddress,
           count,
@@ -328,8 +329,8 @@ const transferERC721 = async (
   console.log(receipt.hash);
   console.log('confirmed');
   console.log({ receipt });
-  const events = await avatarPackContract.queryFilter(
-    avatarPackContract.filters['Transfer'](
+  const events = await erc721Contract.queryFilter(
+    erc721Contract.filters['Transfer'](
       ethers.constants.AddressZero,
       walletAddress
     ),
@@ -427,8 +428,8 @@ const transferERC20 = async (
   console.log(receipt.hash);
   console.log('confirmed');
   console.log({ receipt });
-  const events = await avatarPackContract.queryFilter(
-    avatarPackContract.filters['Transfer'](
+  const events = await erc721Contract.queryFilter(
+    erc721Contract.filters['Transfer'](
       ethers.constants.AddressZero,
       walletAddress
     ),
@@ -499,3 +500,12 @@ export const ichigoSdk = {
   mintERC20,
   transferERC20,
 };
+
+export const sdk = new IchigoSDK({
+  rpc: 'https://base-sepolia.g.alchemy.com/v2/JOMsB_RG7ymuGmGM1NqlFRXuwYJ1E1Yh',
+  paymaster: {
+    type: 'ALCHEMY',
+    policyId: 'ae7829c6-25de-4150-9cc8-274d53bf209a',
+    rpc: 'https://base-sepolia.g.alchemy.com/v2/JOMsB_RG7ymuGmGM1NqlFRXuwYJ1E1Yh',
+  },
+});

@@ -4,7 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { ichigoSdk } from '../../app/sdk';
+import { sdk } from '../../app/sdk';
+import {
+  AVATAR_PACK_ADDRESS,
+  EZ_TOKEN_ADDRESS,
+} from '../../../src/app/contracts';
 
 @Component({
   selector: 'app-ichigo-pay',
@@ -58,15 +62,26 @@ export class IchigoPayComponent {
 
       this.isPaymentInProgress = true;
       const res = this.data.erc20Mint
-        ? await ichigoSdk.mintERC20(this.name, 'ALCHEMY', (_, x) => {
-            if (x !== undefined) {
-              this.message = x;
-            }
+        ? await sdk.mint({
+            contractAddress: this.data.erc20Mint.contractAddress,
+            type: 'ERC20',
+            username: this.name,
+            values: [this.data.erc20Mint.count],
+            statusUpdateFn: (_, x) => {
+              if (x !== undefined) {
+                this.message = x;
+              }
+            },
           })
-        : await ichigoSdk.mintERC721(this.name, 'ALCHEMY', (_, x) => {
-            if (x !== undefined) {
-              this.message = x;
-            }
+        : await sdk.mint({
+            contractAddress: this.data.nftMint!.contractAddress,
+            type: 'ERC721',
+            username: this.name,
+            statusUpdateFn: (_, x) => {
+              if (x !== undefined) {
+                this.message = x;
+              }
+            },
           });
 
       this.activeModal?.dismiss(
