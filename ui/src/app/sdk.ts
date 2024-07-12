@@ -9,11 +9,15 @@ export const sdk = new IchigoSDK({
   },
 });
 
-const contractAddress = '0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1'
 
-sdk.mint({
-  type: 'CUSTOM',
-  contractAddress,
-  abi: [],
-  values: [],
+const toAddress = ''
+const itemId = 117
+
+await sdk.call({
+  contractAddress: '0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1',
+  fnName: 'transferFrom',
+  values: (fromAddress) => [fromAddress, toAddress, itemId],
+  abi: [/* ABI goes here */],
+
+  username: 'user_unique_username'
 })

@@ -172,11 +172,8 @@ export class IchigoSDK {
 
     const statusUpdateFn = props.statusUpdateFn;
 
-    const walletAddress = await this.walletFactoryContract['getAddress'](
-      username,
-      0
-    );
-    console.log('walletAddress', walletAddress);
+    const walletAddress = await this.getWalletAddress(username)
+    // console.log('walletAddress', walletAddress);
 
     statusUpdateFn?.(`Selected Paymaster: ${this.options.paymaster.type}`);
 
@@ -287,6 +284,12 @@ export class IchigoSDK {
     );
 
     return [events, receipt];
+  }
+
+  async getWalletAddress(username: string) {
+    const address = await this.walletFactoryContract['getAddress'](username, 0);
+
+    return address;
   }
 
   private async sendUserOp(

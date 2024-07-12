@@ -16,6 +16,7 @@ Few important notes:
 * Each `username` has its own unique account address
 * `Passkeys` are used for authentication.
 * `username` is connected to the specific `Passkey`. The user who owns the `Passkey`, owns the account.
+* AA wallet is created on the first write operation. However you can always get the wallet address by `username`.
 
 ## Initialization
 
@@ -92,3 +93,26 @@ await sdk.transfer({
 
 
 ## Call (Custom)
+
+Low-level api to implement any smart contract call:
+```ts
+const toAddress = '0x91D76D31080ca88339a4E506aFfB4dED4b192bCb'
+const count = 7
+
+await sdk.call({
+  contractAddress: '0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1',
+  fnName: 'transfer',
+  values: () => [toAddress, count], // function arguments
+  abi: [/* ABI goes here */],
+
+  username: 'user_unique_username'
+})
+```
+
+
+## Utility
+
+You can always get the wallet address of any username. It will not do any operation on-chain.
+```ts
+const walletAddress = await sdk.getWalletAddress('user_unique_username')
+```
