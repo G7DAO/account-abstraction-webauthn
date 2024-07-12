@@ -35,6 +35,7 @@
     "buffer": "^6.0.3",
     "cbor-x": "^1.5.7",
     "ethers": "^5.7.2",
+    "ichigo-sdk": "^0.1.1",
     "ionic-angular": "^3.9.10",
     "ionicons": "^7.2.1",
     "rxjs": "~7.8.0",

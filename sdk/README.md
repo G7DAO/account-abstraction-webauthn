@@ -1,27 +1,94 @@
-# Sdk
+# 🍓 Ichigo SDK
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.5.
+Web3 Wallet SDK - Using AA (ERC-4337) and WebAuthn (PassKeys).
 
-## Development server
+## Features:
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- Fully customisable UI
+- Integrated Paymaster support - Alchemy, Stackup, Custom.
+- No Extensiosn, No new apps necessary - Works directly into browser
+- Easy to use
+- Secured by web standard WebAuthn - Trusted by companies like Apple & Google.
 
-## Code scaffolding
+## Notes
+Few important notes:
+* Users are identified by `username` - unique string
+* Each `username` has its own unique account address
+* `Passkeys` are used for authentication.
+* `username` is connected to the specific `Passkey`. The user who owns the `Passkey`, owns the account.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Initialization
 
-## Build
+Using Alchemy paymaster and bundler:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+```ts
+import { IchigoSDK } from "ichigo-sdk";
 
-## Running unit tests
+const RPC_URL =
+  "https://base-sepolia.g.alchemy.com/v2/JOMsB_RG7ymuGmGM1NqlFRXuwYJ1E1Yh";
+const POLICY_ID = "ae7829c6-25de-4150-9cc8-274d53bf209a";
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+export const sdk = new IchigoSDK({
+  rpc: RPC_URL,
+  paymaster: {
+    type: "ALCHEMY",
+    policyId: POLICY_ID,
+    rpc: RPC_URL,
+  },
+});
+```
 
-## Running end-to-end tests
+## Mint
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Mint NFT (ERC721):
 
-## Further help
+```ts
+await sdk.mint({
+  type: "ERC721",
+  contractAddress: "0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1",
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+  username: "user_unique_username", // passkey will be attached to the username
+});
+```
+
+Mint ERC20:
+
+```ts
+await sdk.mint({
+  type: "ERC20",
+  contractAddress: "0x72788aAd0e291cDC498dd814dE76c34ae2d46a39",
+
+  username: "user_unique_username",
+});
+```
+
+## Transfer
+
+Transfer NFT (ERC721):
+
+```ts
+await sdk.transfer({
+  type: "ERC721",
+  contractAddress: "0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1",
+  toAddress: "0x91D76D31080ca88339a4E506aFfB4dED4b192bCb",
+  id: 117,
+
+  username: "user_unique_username",
+});
+```
+
+Transfer ERC20:
+
+```ts
+await sdk.transfer({
+  type: "ERC20",
+  contractAddress: "0x10bb2Ee7761C2356F7D7e42311b0fDf8e5e4dCA1",
+  toAddress: "0x91D76D31080ca88339a4E506aFfB4dED4b192bCb",
+  count: 7,
+
+  username: "user_unique_username",
+});
+```
+
+
+## Call (Custom)

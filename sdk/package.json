@@ -1,9 +1,14 @@
 {
   "name": "ichigo-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "scripts": {
     "build": "tsc"
   },
+  "repository": {
+    "url": "https://github.com/playerx/account-abstraction-webauthn/tree/main/sdk"
+  },
+  "main": "dist/sdk/src/index.js",
+  "types": "dist/sdk/src/index.d.ts",
   "private": false,
   "dependencies": {
     "@peculiar/asn1-ecc": "^2.3.8",
