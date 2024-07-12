@@ -1,12 +1,13 @@
 {
   "name": "ichigo-sdk",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "scripts": {
     "build": "tsc"
   },
   "repository": {
     "url": "https://github.com/playerx/account-abstraction-webauthn/tree/main/sdk"
   },
+  "keywords": ["wallet", "sdk", "web3", "ethereum", "crypto"],
   "main": "dist/sdk/src/index.js",
   "types": "dist/sdk/src/index.d.ts",
   "private": false,
