@@ -14,7 +14,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/angular/standalone';
-import { ichigoSdk } from '../sdk';
+import { sdk } from '../sdk';
+import { AVATAR_PACK_ADDRESS } from '../contracts';
 
 @Component({
   selector: 'app-console-demo',
@@ -49,16 +50,17 @@ export class ConsoleDemoPage {
   async mint(name: string) {
     this.disabled = true;
     try {
-      const [events, receipt] = await ichigoSdk.mintERC721(
-        name,
-        this.selectedPaymaster as any,
-        (x) => {
+      const [events, receipt] = await sdk.mint({
+        contractAddress: AVATAR_PACK_ADDRESS,
+        type: 'ERC721',
+        username: name,
+        statusUpdateFn: (x) => {
           this.statusTextList.update((y) => [...y, x]);
           if (this.followLogs) {
             this.content?.scrollToBottom(200);
           }
-        }
-      );
+        },
+      });
 
       this.statusTextList.update((x) => [
         ...x,

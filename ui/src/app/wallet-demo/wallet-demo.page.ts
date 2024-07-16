@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   AlertController,
@@ -21,12 +21,13 @@ import {
   type PayData,
 } from '../../components/ichigo-pay/ichigo-pay.component';
 import {
-  avatarPackContract,
+  AVATAR_PACK_ADDRESS,
+  erc721Contract,
   EZ_TOKEN_ADDRESS,
   ezTokenContract,
   walletFactoryContract,
 } from '../contracts';
-import { ichigoSdk } from '../sdk';
+import { sdk } from '../sdk';
 
 @Component({
   selector: 'app-wallet-demo',
@@ -49,7 +50,7 @@ import { ichigoSdk } from '../sdk';
     IchigoPayComponent,
   ],
 })
-export class WalletDemoPage {
+export class WalletDemoPage implements OnInit {
   message =
     'This modal example uses triggers to automatically open a modal when the button is clicked.';
   name: string = '';
@@ -134,15 +135,14 @@ export class WalletDemoPage {
     console.log({ toAddress, item });
 
     this.transferingTokenId = item;
-    const transferRes = await ichigoSdk
-      .transferERC721(
-        this.savedUserAddress,
-        this.savedName,
+    const transferRes = await sdk
+      .transfer({
+        contractAddress: AVATAR_PACK_ADDRESS,
         toAddress,
-        Number(item),
-        'ALCHEMY',
-        () => {}
-      )
+        type: 'ERC721',
+        id: Number(item),
+        username: this.savedName,
+      })
       .finally(() => (this.transferingTokenId = 0));
 
     console.log(transferRes);
@@ -171,15 +171,14 @@ export class WalletDemoPage {
     console.log({ toAddress, count });
 
     this.transferingERC20 = true;
-    const transferRes = await ichigoSdk
-      .transferERC20(
-        this.savedUserAddress,
-        this.savedName,
+    const transferRes = await sdk
+      .transfer({
+        contractAddress: EZ_TOKEN_ADDRESS,
         toAddress,
-        Number(count),
-        'ALCHEMY',
-        () => {}
-      )
+        type: 'ERC20',
+        count: Number(count),
+        username: this.savedName,
+      })
       .finally(() => (this.transferingERC20 = false));
 
     console.log(transferRes);
@@ -197,9 +196,7 @@ export class WalletDemoPage {
   }
 
   openERC20Details() {
-    window.open(
-      `https://sepolia.basescan.org/address/${EZ_TOKEN_ADDRESS}`
-    );
+    window.open(`https://sepolia.basescan.org/address/${EZ_TOKEN_ADDRESS}`);
   }
 
   async claimERC20() {
@@ -218,13 +215,13 @@ export class WalletDemoPage {
             totalPriceInCents,
 
             data: {
-              networkName: 'Sepolia',
+              networkName: 'Base Sepolia',
 
               erc20Mint: {
                 name: 'EZ Token',
                 count: 10,
 
-                contractAddress: '0xBc78b7b71739F5AD641050Ea0AC17487ceA79637',
+                contractAddress: EZ_TOKEN_ADDRESS,
                 contractLink:
                   'https://sepolia.basescan.org/address/0xBc78b7b71739F5AD641050Ea0AC17487ceA79637',
               },
@@ -282,7 +279,7 @@ export class WalletDemoPage {
             totalPriceInCents,
 
             data: {
-              networkName: 'Sepolia',
+              networkName: 'Base Sepolia',
 
               nftMint: {
                 name: 'Purple Hat',
@@ -290,7 +287,7 @@ export class WalletDemoPage {
                 collectionLink: 'https://gov.game7.io',
                 imageUrl: '/assets/headwear2_image1.png',
 
-                contractAddress: '0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9',
+                contractAddress: AVATAR_PACK_ADDRESS,
                 contractLink:
                   'https://sepolia.basescan.org/address/0x4b3b5d4abe57eb7a00bbe9cc3ee743509b04f4e9',
               },
@@ -348,9 +345,7 @@ export class WalletDemoPage {
   }
 
   async loadOwnedNFTs(walletAddress: string) {
-    const res = await avatarPackContract.callStatic['userTokens'](
-      walletAddress
-    );
+    const res = await erc721Contract.callStatic['userTokens'](walletAddress);
     console.log('userTokens', res);
     return res;
   }
